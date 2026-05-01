@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neel's Pit Wall · Personal F1 Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --card: #18181d;
+      --card-2: #202028;
+      --text: #f5f5f7;
+      --muted: #b0b0ba;
+      --accent: #e8002d;      /* Ferrari red */
+      --accent-hot: #ff2d55;  /* brighter Ferrari red accent */
+      --accent-deep: #a10021; /* deeper Ferrari red */
+      --rule: #2b2b35;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 500px at 20% -10%, #2a0a14 0%, var(--bg) 45%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .hero {
+      background: linear-gradient(135deg, var(--card), var(--card-2));
+      border: 1px solid var(--rule);
+      border-top: 4px solid var(--accent);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .eyebrow {
+      color: var(--accent-hot);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    h1 { font-size: clamp(28px, 5vw, 52px); line-height: 1.05; margin-bottom: 10px; }
+    .subtitle { color: var(--muted); font-size: 15px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .kicker {
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .value.accent { color: var(--accent-hot); }
+    .meta { margin-top: 8px; color: var(--muted); font-size: 14px; }
+
+    .bar {
+      margin-top: 12px;
+      height: 8px;
+      border-radius: 999px;
+      background: #2b2b35;
+      overflow: hidden;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 76%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hot));
+    }
+
+    .ticker {
+      background: #12090d;
+      border: 1px solid #3a1721;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #ffdbe3;
+      font-size: 13px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker span { margin-right: 22px; }
+
+    footer {
+      padding-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Personal Edition · F1 Dashboard</div>
+      <h1>Neel's Pit Wall</h1>
+      <p class="subtitle">Built around your race weekend: Ferrari-first visuals, Charles Leclerc focus, and quick season context.</p>
+    </section>
+
+    <section class="ticker" aria-label="F1 quick ticker">
+      <span>FAVORITE DRIVER: <strong>Charles Leclerc</strong></span>
+      <span>FAVORITE TEAM: <strong>Ferrari</strong></span>
+      <span>THEME: <strong>Ferrari Red Accents</strong></span>
+      <span>NEXT RACE: <strong>Miami GP</strong></span>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="kicker">Driver Focus</div>
+        <div class="value accent">Charles Leclerc</div>
+        <p class="meta">Team Ferrari · Car #16 · Monaco</p>
+      </article>
+
+      <article class="card">
+        <div class="kicker">Team Focus</div>
+        <div class="value">Scuderia Ferrari</div>
+        <p class="meta">Power Unit: Ferrari · Nationality: Italy</p>
+      </article>
+
+      <article class="card">
+        <div class="kicker">Season Snapshot</div>
+        <div class="value">P3</div>
+        <p class="meta">Leclerc currently in podium contention.</p>
+        <div class="bar"><span></span></div>
+      </article>
+
+      <article class="card">
+        <div class="kicker">Neel's Race Mode</div>
+        <div class="value accent">Tifosi On</div>
+        <p class="meta">Accents tuned to Ferrari red across the dashboard.</p>
+      </article>
+    </section>
+
+    <footer>For Neel · Lights out and away we go</footer>
+  </main>
+</body>
+</html>
