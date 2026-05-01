@@ -1600,15 +1600,69 @@ body.colo-open { overflow: hidden; }
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(10,10,10,0.82);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  /* Dim only; dashboard scrolls/readable behind modal */
+  background: transparent;
+  pointer-events: none;
+}
+.auth-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.55) 100%);
+  z-index: 1;
+}
+.auth-overlay-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  pointer-events: auto;
+  z-index: 3;
+}
+.auth-bg-strip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 2;
+}
+.auth-bg-video-wrap {
+  position: absolute;
+  inset: -5%;
+  opacity: 0.45;
+}
+.auth-bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.08) saturate(1.05);
+}
+.auth-bg-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(232,0,45,0.18) 0%, transparent 55%),
+    repeating-linear-gradient(90deg, #0a0a0a 0 40px, #1a1612 40px 80px);
+  opacity: 0.7;
+}
+.auth-bg-caption {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  z-index: 1;
+  text-align: center;
+  max-width: 90vw;
 }
 .auth-card {
+  position: relative;
+  z-index: 4;
   width: min(540px, 100%);
   background: var(--paper);
   color: var(--ink);
@@ -1685,6 +1739,12 @@ body.colo-open { overflow: hidden; }
   background: transparent;
   color: var(--ink);
 }
+.auth-recover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
 .auth-msg {
   font-size: 12px;
   color: var(--ink-2);
@@ -1719,12 +1779,28 @@ body.colo-open { overflow: hidden; }
   .colo-p { padding: 10px 6px 9px; }
   .colo-p-val { font-size: 18px; }
 }
+
+@media (max-width: 620px) {
+  .auth-bg-video-wrap {
+    inset: -10%;
+    opacity: 0.38;
+  }
+}
 /* ================ END COLOPHON STYLES ====================== */
 </style>
 </head>
 <body>
 
 <div class="auth-overlay" id="authOverlay">
+  <div class="auth-overlay-backdrop" aria-hidden="true"></div>
+  <div class="auth-bg-strip" aria-hidden="true">
+    <div class="auth-bg-fallback" id="authBgFallback"></div>
+    <div class="auth-bg-video-wrap">
+      <video id="authBgVideo" class="auth-bg-video" muted playsinline preload="metadata" aria-hidden="true"></video>
+    </div>
+    <p class="auth-bg-caption">Drop your clips (rights cleared) into ./clips/ as verstappen-storm.mp4 · leclerc-sunset.mp4 · schumi-classic.mp4</p>
+  </div>
+  <div class="auth-overlay-inner">
   <div class="auth-card">
     <div class="auth-head">
       <div class="auth-kicker">Personal Garage Access</div>
@@ -1743,6 +1819,10 @@ body.colo-open { overflow: hidden; }
       </div>
 
       <div id="onboardFields">
+        <div class="auth-field">
+          <label for="authEmail">Email (for recovery code)</label>
+          <input id="authEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
         <div class="auth-row">
           <div class="auth-field">
             <label for="displayName">What should we call you?</label>
@@ -1771,14 +1851,22 @@ body.colo-open { overflow: hidden; }
       </div>
 
       <div id="recoveryFields" class="auth-hidden">
+        <p class="auth-hint">We&apos;ll verify your account email with a 6-digit code (demo uses your browser).</p>
+        <div class="auth-field">
+          <label for="recoverEmail">Account email</label>
+          <input id="recoverEmail" name="recoverEmail" type="email" autocomplete="email" placeholder="Same email you used when signing up">
+        </div>
+        <div class="auth-recover-actions">
+          <button type="button" class="auth-btn secondary" id="recoverSendBtn">Email me a code</button>
+        </div>
         <div class="auth-row">
           <div class="auth-field">
-            <label for="recoverDriver">Recovery check · favorite driver</label>
-            <input id="recoverDriver" name="recoverDriver" placeholder="e.g. Charles Leclerc">
+            <label for="recoverCode">6-digit code</label>
+            <input id="recoverCode" name="recoverCode" inputmode="numeric" maxlength="12" autocomplete="one-time-code" placeholder="Paste from email">
           </div>
           <div class="auth-field">
-            <label for="recoverTeam">Recovery check · favorite team</label>
-            <input id="recoverTeam" name="recoverTeam" placeholder="e.g. Ferrari">
+            <label for="recoverDummy" class="auth-hidden">&nbsp;</label>
+            <span class="auth-hint">&nbsp;</span>
           </div>
         </div>
       </div>
@@ -1786,11 +1874,13 @@ body.colo-open { overflow: hidden; }
       <div class="auth-actions">
         <button type="submit" class="auth-btn" id="authSubmit">Create Profile</button>
         <button type="button" class="auth-btn secondary" id="authToggle">I already have an account</button>
+        <button type="button" class="auth-btn secondary" id="authGuest">Continue without account</button>
         <button type="button" class="auth-link" id="authForgot">Forgot password?</button>
       </div>
       <p class="auth-hint" id="authHint">Tip: create once, then next time just login.</p>
       <p class="auth-msg" id="authMsg"></p>
     </form>
+  </div>
   </div>
 </div>
 
@@ -2310,12 +2400,187 @@ Return the COMPLETE HTML in one code block. Preserve every
 
 <script>
 const DEFAULT_PROFILE = {
+  email: '',
   displayName: 'Neel',
   favoriteDriver: 'Charles Leclerc',
   favoriteTeam: 'Ferrari',
   accentTheme: 'ferrari'
 };
 let activeProfile = { ...DEFAULT_PROFILE };
+const AUTH_OTP_KEY = 'pitwallResetOtp';
+const AUTH_CLIP_SOURCES = ['clips/verstappen-storm.mp4', 'clips/leclerc-sunset.mp4', 'clips/schumi-classic.mp4'];
+let otpRecord = null; // { username, email, expires, code }
+
+
+function migrateUsers(users) {
+  let changed = false;
+  Object.keys(users).forEach((u) => {
+    const r = users[u];
+    if (!r || typeof r !== 'object') return;
+    if (!r.profile) {
+      r.profile = { ...DEFAULT_PROFILE };
+      changed = true;
+    } else {
+      if (!('email' in r.profile)) { r.profile.email = ''; changed = true; }
+      if (!r.profile.displayName) { r.profile.displayName = DEFAULT_PROFILE.displayName; changed = true; }
+      if (!r.profile.favoriteDriver) { r.profile.favoriteDriver = DEFAULT_PROFILE.favoriteDriver; changed = true; }
+      if (!r.profile.favoriteTeam) { r.profile.favoriteTeam = DEFAULT_PROFILE.favoriteTeam; changed = true; }
+      if (!r.profile.accentTheme) { r.profile.accentTheme = DEFAULT_PROFILE.accentTheme; changed = true; }
+    }
+  });
+  return changed;
+}
+
+async function digestHex(input) {
+  try {
+    if (crypto && crypto.subtle) {
+      const enc = new TextEncoder().encode(input);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2,'0')).join('');
+    }
+  } catch (_) { /* insecure context */ }
+  let h = 0;
+  const s = String(input);
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  }
+  return 'h' + (h >>> 0).toString(16);
+}
+
+async function otpHash(code, username) {
+  return digestHex(username + '|' + code + '|pitwall');
+}
+
+async function otpSave(username, email, plainCode, ttlMs) {
+  otpRecord = { username: String(username || '').trim().toLowerCase(), email: String(email || '').trim().toLowerCase(), expires: Date.now() + ttlMs, codeHash: '' };
+  otpRecord.codeHash = await otpHash(plainCode, otpRecord.username);
+  sessionStorage.setItem(AUTH_OTP_KEY, JSON.stringify(otpRecord));
+}
+
+async function otpLoad() {
+  try {
+    const raw = sessionStorage.getItem(AUTH_OTP_KEY);
+    if (!raw) { otpRecord = null; return; }
+    otpRecord = JSON.parse(raw);
+  } catch (_) { otpRecord = null; }
+}
+
+async function otpVerify(username, plainCode) {
+  await otpLoad();
+  if (!otpRecord) return false;
+  const un = String(username || '').trim().toLowerCase();
+  if (!un || otpRecord.username !== un) return false;
+  if (!otpRecord.expires || Date.now() > otpRecord.expires) return false;
+  const h = await otpHash(plainCode, un);
+  return h === otpRecord.codeHash;
+}
+
+function otpClear() {
+  otpRecord = null;
+  sessionStorage.removeItem(AUTH_OTP_KEY);
+}
+
+function otpPlainFromInput(str) {
+  return String(str || '').replace(/\D+/g,'').slice(0,6);
+}
+
+function randomOtpDigits() {
+  let s = '';
+  for (let i = 0; i < 6; i++) s += Math.floor(Math.random() * 10).toString();
+  return s;
+}
+
+function demoEmailBody(username, code) {
+  return `Pit Wall password reset\r\nUsername: ${username}\r\nCode: ${code}\r\nExpires in 10 minutes\r\n\r\n(This demo cannot send mail from the browser unless you plug in EmailJS/backend.)`;
+}
+
+function demoOpenEmail(to, username, code) {
+  const q = encodeURIComponent(demoEmailBody(username, code));
+  const addr = encodeURIComponent(to);
+  window.open(`mailto:${addr}?subject=${encodeURIComponent('Pit Wall — reset code')}&body=` + q, '_blank');
+}
+
+async function simulateSendRecoveryEmail(users, recoverEmailEl, usernameFieldEl, msgEl) {
+  await otpLoad();
+  const emailGuess = recoverEmailEl.value.trim().toLowerCase();
+  if (!emailGuess) {
+    msgEl.textContent = 'Enter the email on file, then tap send code.';
+    return;
+  }
+
+  let matchUser = '';
+  Object.keys(users).forEach((u) => {
+    const em = String(users[u]?.profile?.email || '').trim().toLowerCase();
+    if (em && em === emailGuess) matchUser = u;
+  });
+  const userFromField = String(usernameFieldEl.value || '').trim().toLowerCase();
+  let username = '';
+
+  if (userFromField && users[userFromField]) {
+    const em = String(users[userFromField].profile?.email || '').trim().toLowerCase();
+    if (emailGuess && (!em || em !== emailGuess)) {
+      msgEl.textContent = 'That email does not match this username. Fix username or email.';
+      return;
+    }
+    username = userFromField;
+  }
+
+  if (!username && matchUser) username = matchUser;
+  if (!username) {
+    msgEl.textContent = 'No profile found with that email. Create an account first.';
+    return;
+  }
+
+  const code = randomOtpDigits();
+  await otpSave(username, emailGuess, code, 10 * 60 * 1000);
+  msgEl.textContent = `Code sent (demo): ${code}`;
+  demoOpenEmail(emailGuess, username, code);
+}
+
+function setupAuthBackdropVideo() {
+  const vid = document.getElementById('authBgVideo');
+  if (!vid) return;
+  const sources = AUTH_CLIP_SOURCES.filter(Boolean);
+  if (!sources.length) return;
+
+  let i = 0;
+  let fails = 0;
+
+  function loadSrc(src) {
+    function onLoaded() {
+      vid.removeEventListener('loadeddata', onLoaded);
+      vid.removeEventListener('error', onErr);
+      fails = 0;
+      vid.play().catch(() => {});
+    }
+    function onErr() {
+      vid.removeEventListener('loadeddata', onLoaded);
+      vid.removeEventListener('error', onErr);
+      if (sources.length <= 1) return;
+      fails += 1;
+      i = (i + 1) % sources.length;
+      if (fails > sources.length) return;
+      loadSrc(sources[i]);
+    }
+    vid.loop = sources.length === 1;
+    vid.src = src;
+    vid.addEventListener('loadeddata', onLoaded, { once: true });
+    vid.addEventListener('error', onErr, { once: true });
+    try { vid.load(); } catch (_) { onErr(); }
+  }
+
+  vid.addEventListener('ended', () => {
+    if (sources.length <= 1) return;
+    i = (i + 1) % sources.length;
+    loadSrc(sources[i]);
+  });
+
+  loadSrc(sources[i]);
+}
+
+function clearGuestSession() {
+  localStorage.removeItem('pitwallSession');
+}
 
 function applyAccentTheme(theme) {
   const themes = {
@@ -2385,53 +2650,109 @@ function getSession() {
 }
 
 function initAuth() {
+  let users = getUsers();
+  if (migrateUsers(users)) setUsers(users);
+
   const overlay = document.getElementById('authOverlay');
   const form = document.getElementById('authForm');
   const toggleBtn = document.getElementById('authToggle');
+  const guestBtn = document.getElementById('authGuest');
   const forgotBtn = document.getElementById('authForgot');
+  const recoverSendBtn = document.getElementById('recoverSendBtn');
   const submitBtn = document.getElementById('authSubmit');
   const msg = document.getElementById('authMsg');
   const hint = document.getElementById('authHint');
   const onboardFields = document.getElementById('onboardFields');
   const recoveryFields = document.getElementById('recoveryFields');
+  const emailInput = document.getElementById('authEmail');
+  const recoverEmail = document.getElementById('recoverEmail');
+  const recoverCodeEl = document.getElementById('recoverCode');
   const userInput = document.getElementById('authUser');
   const passInput = document.getElementById('authPass');
   const passLabel = document.querySelector('label[for="authPass"]');
-  const recoverDriver = document.getElementById('recoverDriver');
-  const recoverTeam = document.getElementById('recoverTeam');
   let mode = 'signup';
+
+  setupAuthBackdropVideo();
 
   function setMode(next) {
     mode = next;
-    const signup = mode === 'signup', forgot = mode === 'forgot';
+    const signup = mode === 'signup', forgot = mode === 'forgot', login = mode === 'login';
     onboardFields.classList.toggle('auth-hidden', !signup);
     recoveryFields.classList.toggle('auth-hidden', !forgot);
+    guestBtn.style.display = forgot ? 'none' : '';
+
+    toggleBtn.style.display = forgot ? 'none' : '';
+
+    forgotBtn.disabled = signup;
+    forgotBtn.style.opacity = signup ? '0.45' : '1';
+
+    emailInput.required = signup;
+    emailInput.closest('.auth-field')?.classList.toggle('auth-hidden', forgot);
+
+    passInput.required = true;
+    passLabel.textContent = forgot ? 'New Password' : 'Password';
+    passInput.setAttribute('autocomplete', (signup || forgot) ? 'new-password' : 'current-password');
+
     submitBtn.textContent = signup ? 'Create Profile' : (forgot ? 'Reset & Login' : 'Login');
     toggleBtn.textContent = signup ? 'I already have an account' : 'Create a new profile';
     forgotBtn.textContent = forgot ? 'Back to login' : 'Forgot password?';
-    passLabel.textContent = forgot ? 'New Password' : 'Password';
-    passInput.setAttribute('autocomplete', (signup || forgot) ? 'new-password' : 'current-password');
-    hint.textContent = signup
-      ? 'Tip: create once, then next time just login.'
-      : (forgot ? 'We will verify your saved favorites before resetting.' : 'Welcome back. Enter your details to continue.');
-    msg.textContent = signup ? 'Answer the setup questions to personalize your dashboard.' : '';
-    if (!forgot) {
-      recoverDriver.value = '';
-      recoverTeam.value = '';
+
+    if (signup) {
+      hint.textContent = 'Tip: add your email once so Forgot Password works.';
+      msg.textContent = 'Answer the setup questions and create your login.';
+    } else if (login) {
+      hint.textContent = 'Welcome back.';
+      msg.textContent = '';
+    } else {
+      hint.textContent = 'Use the same username + email you signed up with, then Email me a code.';
+      msg.textContent = '';
+      recoverEmail.required = true;
+      recoverCodeEl.required = true;
+      recoverEmail.value = emailInput.value.trim() || recoverEmail.value;
+      userInput.focus();
     }
-    requestAnimationFrame(() => (userInput.value ? passInput : userInput).focus());
+
+    if (!forgot) {
+      recoverEmail.value = '';
+      recoverCodeEl.value = '';
+      recoverEmail.required = false;
+      recoverCodeEl.required = false;
+      otpClear();
+      recoverSendBtn.disabled = false;
+      recoverSendBtn.textContent = 'Email me a code';
+    }
+
+    requestAnimationFrame(() => {
+      if (!forgot) userInput.focus();
+    });
   }
 
   toggleBtn.addEventListener('click', () => setMode(mode === 'signup' ? 'login' : 'signup'));
-  forgotBtn.addEventListener('click', () => setMode(mode === 'forgot' ? 'login' : 'forgot'));
-
-  userInput.addEventListener('blur', () => {
-    if (!userInput.value.trim()) return;
-    const users = getUsers();
-    if (users[userInput.value.trim().toLowerCase()] && mode === 'signup') setMode('login');
+  forgotBtn.addEventListener('click', () => {
+    if (mode === 'signup') return;
+    setMode(mode === 'forgot' ? 'login' : 'forgot');
   });
 
-  form.addEventListener('submit', (e) => {
+  guestBtn.addEventListener('click', () => {
+    otpClear();
+    setSession('__guest__');
+    overlay.hidden = true;
+    applyProfile(DEFAULT_PROFILE);
+  });
+
+  recoverSendBtn.addEventListener('click', async () => {
+    msg.textContent = '';
+    recoverSendBtn.disabled = true;
+    recoverSendBtn.textContent = 'Sending...';
+    try {
+      await simulateSendRecoveryEmail(getUsers(), recoverEmail, userInput, msg);
+    } finally {
+      recoverSendBtn.disabled = false;
+      recoverSendBtn.textContent = 'Email me a code';
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
     const username = String(fd.get('username') || '').trim().toLowerCase();
@@ -2441,25 +2762,37 @@ function initAuth() {
       return;
     }
 
-    const users = getUsers();
+    users = getUsers();
+
     if (mode === 'forgot') {
       const record = users[username];
       if (!record) {
-        msg.textContent = 'User not found. Check username or create a new profile.';
+        msg.textContent = 'User not found. Check username.';
         return;
       }
-      const rd = String(fd.get('recoverDriver') || '').trim().toLowerCase();
-      const rt = String(fd.get('recoverTeam') || '').trim().toLowerCase();
-      const pd = String(record.profile?.favoriteDriver || '').trim().toLowerCase();
-      const pt = String(record.profile?.favoriteTeam || '').trim().toLowerCase();
-      if (!rd || !rt || rd !== pd || rt !== pt) {
-        msg.textContent = 'Recovery answers do not match this user profile.';
+      const emailOnFile = String(record.profile?.email || '').trim().toLowerCase();
+      const typedEmail = String(fd.get('recoverEmail') || '').trim().toLowerCase();
+      const codeDigits = otpPlainFromInput(fd.get('recoverCode'));
+      if (!typedEmail || !emailOnFile || typedEmail !== emailOnFile) {
+        msg.textContent = 'Email does not match the account on file.';
         return;
       }
+      await otpLoad();
+      if (!otpRecord || otpRecord.username !== username || otpRecord.email !== typedEmail) {
+        msg.textContent = 'Tap “Email me a code” first, then paste the latest code.';
+        return;
+      }
+      const ok = await otpVerify(username, codeDigits);
+      if (!ok || codeDigits.length !== 6) {
+        msg.textContent = 'Invalid or expired code. Request a new one.';
+        return;
+      }
+
       record.password = password;
       users[username] = record;
       setUsers(users);
       setSession(username);
+      otpClear();
       overlay.hidden = true;
       applyProfile(record.profile || DEFAULT_PROFILE);
       return;
@@ -2467,10 +2800,27 @@ function initAuth() {
 
     if (mode === 'signup') {
       if (users[username]) {
-        msg.textContent = 'That username already exists. Switch to login.';
+        msg.textContent = 'That username exists. Tap “Login” instead.';
         return;
       }
+      const signupEmail = String(fd.get('email') || '').trim().toLowerCase();
+      if (!signupEmail || !signupEmail.includes('@')) {
+        msg.textContent = 'Please enter a real email address for resets.';
+        return;
+      }
+
+      let taken = '';
+      Object.keys(users).forEach((u) => {
+        const em = String(users[u]?.profile?.email || '').trim().toLowerCase();
+        if (em && em === signupEmail) taken = u;
+      });
+      if (taken) {
+        msg.textContent = 'That email is already used. Login or reset instead.';
+        return;
+      }
+
       const profile = {
+        email: signupEmail,
         displayName: String(fd.get('displayName') || DEFAULT_PROFILE.displayName).trim() || DEFAULT_PROFILE.displayName,
         favoriteDriver: String(fd.get('favoriteDriver') || DEFAULT_PROFILE.favoriteDriver).trim() || DEFAULT_PROFILE.favoriteDriver,
         favoriteTeam: String(fd.get('favoriteTeam') || DEFAULT_PROFILE.favoriteTeam).trim() || DEFAULT_PROFILE.favoriteTeam,
@@ -2484,31 +2834,46 @@ function initAuth() {
       return;
     }
 
+    /* login */
     const record = users[username];
     if (!record || record.password !== password) {
-      msg.textContent = 'Invalid username or password.';
+      msg.textContent = 'Wrong password or username. Try again or Forgot password.';
       return;
     }
+    otpClear();
     setSession(username);
     overlay.hidden = true;
     applyProfile(record.profile || DEFAULT_PROFILE);
   });
 
   const sessionUser = getSession();
-  const users = getUsers();
-  if (sessionUser && users[sessionUser]) {
+  users = getUsers();
+
+  if (sessionUser === '__guest__') {
+    otpClear();
     overlay.hidden = true;
-    applyProfile(users[sessionUser].profile || DEFAULT_PROFILE);
-  } else {
-    overlay.hidden = false;
-    const knownUsers = Object.keys(users);
-    if (knownUsers.length > 0) {
-      userInput.value = knownUsers[0];
-      setMode('login');
-    } else {
-      setMode('signup');
-    }
     applyProfile(DEFAULT_PROFILE);
+    return;
+  }
+
+  if (!sessionUser) {
+    overlay.hidden = false;
+    applyProfile(DEFAULT_PROFILE);
+    if (Object.keys(users).length === 0) setMode('signup');
+    else setMode('login');
+    return;
+  }
+
+  const rec = users[sessionUser];
+  if (rec) {
+    otpClear();
+    overlay.hidden = true;
+    applyProfile(rec.profile || DEFAULT_PROFILE);
+  } else {
+    clearGuestSession();
+    overlay.hidden = false;
+    applyProfile(DEFAULT_PROFILE);
+    setMode('signup');
   }
 }
 
