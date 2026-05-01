@@ -545,6 +545,96 @@ body {
   margin-top: 12px;
 }
 
+.telemetry-section {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 36px 8px;
+  background: var(--paper);
+}
+.telemetry-card {
+  margin-top: 14px;
+  background: linear-gradient(135deg, #101010 0%, #171717 45%, #0c0c0c 100%);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top: 4px solid var(--racing);
+  padding: 22px 24px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.telemetry-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 12% -10%, rgba(232,0,45,0.18), transparent 45%),
+    radial-gradient(circle at 92% 120%, rgba(255,255,255,0.06), transparent 42%);
+  pointer-events:none;
+  z-index:0;
+}
+.telemetry-inner { position:relative; z-index:1; }
+.telemetry-head {
+  display:flex; flex-wrap:wrap; gap:14px 24px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 14px;
+}
+.telemetry-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--racing-hot);
+  margin-bottom: 6px;
+}
+.telemetry-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.02em;
+}
+.telemetry-title em { font-style: italic; font-weight: 500; color: var(--racing-hot); }
+.telemetry-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.6;
+  text-align: right;
+  max-width: 420px;
+}
+.telemetry-charts {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 16px;
+}
+.telemetry-pane {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 14px 12px 10px;
+  min-height: 220px;
+}
+.telemetry-pane h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+}
+.telemetry-pane canvas { width:100% !important; height: 200px !important; }
+.telemetry-note {
+  margin-top: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.55);
+}
+@media (max-width: 980px) {
+  .telemetry-charts { grid-template-columns: 1fr; }
+  .telemetry-meta { text-align: left; max-width: none; }
+  .telemetry-section { padding-left: 20px; padding-right: 20px; }
+}
+
 .cal-section {
   max-width: 1440px;
   margin: 0 auto;
@@ -1923,31 +2013,31 @@ body.colo-open { overflow: hidden; }
     <div class="race-grid">
       <div class="race-left">
         <div class="race-meta-row">
-          <span class="race-round">◆ Round 04 · Up Next</span>
-          <span class="race-flag-big">🇺🇸</span>
+          <span class="race-round" id="raceRoundLabel">◆ Loading schedule…</span>
+          <span class="race-flag-big" id="raceFlagEmoji" aria-hidden="true">🏁</span>
         </div>
-        <h2 class="race-name">Miami <em>Grand Prix</em></h2>
-        <div class="race-circuit"><strong>Miami International Autodrome</strong> · Hard Rock Stadium</div>
-        <div class="race-circuit">Round 4 of 23 · 57 laps · 308.326 km</div>
+        <h2 class="race-name" id="raceTitle">Next <em>Grand Prix</em></h2>
+        <div class="race-circuit" id="raceCircuitLine"><strong>Circuit loading…</strong></div>
+        <div class="race-circuit" id="raceSubtitle">Season data · Jolpica F1 API</div>
 
         <div class="race-stats">
           <div class="race-stat">
-            <div class="race-stat-label">Lap Record</div>
-            <div class="race-stat-val">1:29.708</div>
+            <div class="race-stat-label">Next Session</div>
+            <div class="race-stat-val" id="raceStatSession">…</div>
           </div>
           <div class="race-stat">
-            <div class="race-stat-label">Pole 2025</div>
-            <div class="race-stat-val">M. Verstappen</div>
+            <div class="race-stat-label">Round</div>
+            <div class="race-stat-val" id="raceStatRound">…</div>
           </div>
           <div class="race-stat">
-            <div class="race-stat-label">Dates</div>
-            <div class="race-stat-val">May 1 – 3</div>
+            <div class="race-stat-label">Weekend</div>
+            <div class="race-stat-val" id="raceStatWeekend">…</div>
           </div>
         </div>
       </div>
 
       <div class="race-right">
-        <div class="countdown-label">Lights Out In</div>
+        <div class="countdown-label" id="countdownLabel">Session Starts In</div>
         <div class="countdown">
           <div class="cd-cell"><div class="cd-num" id="cd-d">00</div><div class="cd-label">Days</div></div>
           <div class="cd-cell"><div class="cd-num" id="cd-h">00</div><div class="cd-label">Hours</div></div>
@@ -1959,14 +2049,41 @@ body.colo-open { overflow: hidden; }
   </div>
 </section>
 
+<section class="telemetry-section" aria-label="Live telemetry preview">
+  <div class="telemetry-card">
+    <div class="telemetry-inner">
+      <div class="telemetry-head">
+        <div>
+          <div class="telemetry-eyebrow">OpenF1 · car data</div>
+          <div class="telemetry-title">Live <em>telemetry strip</em></div>
+        </div>
+        <div class="telemetry-meta" id="telemetryMeta">
+          Sampling speed &amp; throttle from OpenF1 (filtered snapshots on track). Charts appear when timing is available.
+        </div>
+      </div>
+      <div class="telemetry-charts">
+        <div class="telemetry-pane">
+          <h4>Speed · km/h</h4>
+          <canvas id="telemetrySpeedChart" width="640" height="240" aria-label="Speed trace chart"></canvas>
+        </div>
+        <div class="telemetry-pane">
+          <h4>Throttle · %</h4>
+          <canvas id="telemetryThrottleChart" width="640" height="240" aria-label="Throttle trace chart"></canvas>
+        </div>
+      </div>
+      <p class="telemetry-note" id="telemetryFootnote"></p>
+    </div>
+  </div>
+</section>
+
 <section class="cal-section">
   <div class="cal-head">
     <div class="cal-title">Season <em>Calendar</em></div>
-    <div class="cal-meta">23 Rounds · Mar → Dec 2026</div>
+    <div class="cal-meta" id="calMetaHead">Calendar loading…</div>
   </div>
 
   <div class="cal-strip-wrap">
-    <div class="cal-progress-track"><div class="cal-progress-fill" style="width: 13.6%;"></div></div>
+    <div class="cal-progress-track"><div class="cal-progress-fill" id="calProgressFill" style="width: 13.6%;"></div></div>
     <div class="cal-strip" id="calStrip">
 
       <div class="cal-round done"><div class="cal-rnum">R01<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇦🇺</div><div class="cal-country">Australia</div><div class="cal-flag-name">Albert Park</div><div class="cal-date">Mar 06–08</div><div class="cal-winner">G. Russell</div></div>
@@ -2003,9 +2120,10 @@ body.colo-open { overflow: hidden; }
       <div class="col-head">
         <div class="col-num">§ 01</div>
         <div class="col-name">Drivers' <em>Championship</em></div>
-        <div class="col-sub">Top 10 · After 3 Rounds</div>
+        <div class="col-sub" id="driversStandingSub">Top 10 · loading standings…</div>
       </div>
 
+      <div id="driverStandings">
       <div class="driver-row leader" style="--team-color: var(--mercedes); animation-delay:4.5s;">
         <div class="driver-pos">01</div>
         <div class="driver-info"><div class="driver-line"><span class="driver-name">K. Antonelli</span><span class="driver-code" style="background:var(--mercedes); color:#000;">ANT</span></div><div class="driver-team">Mercedes · ITA</div></div>
@@ -2056,15 +2174,18 @@ body.colo-open { overflow: hidden; }
         <div class="driver-info"><div class="driver-line"><span class="driver-name">L. Lawson</span><span class="driver-code" style="background:var(--racingbulls);">LAW</span></div><div class="driver-team">Racing Bulls · NZL · <span class="gap">−62</span></div></div>
         <div class="driver-pts-wrap"><div class="driver-pts">10</div><div class="driver-pts-sub">pts</div></div>
       </div>
+      </div>
+
     </div>
 
     <div class="col">
       <div class="col-head">
         <div class="col-num">§ 02</div>
         <div class="col-name">Constructors' <em>Cup</em></div>
-        <div class="col-sub">All 11 teams · 2026</div>
+        <div class="col-sub" id="constructorsStandingSub">All teams · loading…</div>
       </div>
 
+      <div id="constructorStandings">
       <div class="con-row" style="--team-color: var(--mercedes); animation-delay:4.5s;">
         <div class="con-top"><div class="con-pos">01</div><div><div class="con-name">Mercedes-AMG</div><div class="con-engine">Mercedes PU · DEU</div></div><div class="con-pts">135</div></div>
         <div class="con-bar"><div class="con-bar-fill" style="width:100%; animation-delay:5.5s;"></div></div>
@@ -2109,6 +2230,8 @@ body.colo-open { overflow: hidden; }
         <div class="con-top"><div class="con-pos">11</div><div><div class="con-name">Cadillac</div><div class="con-engine">Ferrari PU · USA · NEW</div></div><div class="con-pts">0</div></div>
         <div class="con-bar"><div class="con-bar-fill" style="width:0%;"></div></div>
       </div>
+      </div>
+
     </div>
 
     <div class="col">
@@ -2119,7 +2242,7 @@ body.colo-open { overflow: hidden; }
       </div>
 
       <div class="podium-block">
-        <div class="podium-head">Japanese GP · Suzuka · Result</div>
+        <div class="podium-head" id="podiumHead">Last race · loading…</div>
         <div class="podium-list">
           <div class="pod-row p1">
             <div class="pod-badge">P1</div>
@@ -2139,7 +2262,7 @@ body.colo-open { overflow: hidden; }
         </div>
       </div>
 
-      <div class="news-block">
+      <div class="news-block" id="newsBlock">
         <article class="news-item lead">
           <div class="news-meta"><span class="news-kicker">The Story</span><span class="news-num">01</span></div>
           <h3 class="news-headline">Antonelli's rookie surge rewrites Mercedes' championship math</h3>
@@ -2276,23 +2399,23 @@ Return the COMPLETE HTML in one code block. Preserve every
   <div class="stats-grid">
     <div class="stat">
       <div class="stat-label">Championship Lead</div>
-      <div class="stat-big"><em>+9</em> pts</div>
-      <div class="stat-sub">Antonelli over Russell</div>
+      <div class="stat-big" id="statChampGap"><em>—</em> pts</div>
+      <div class="stat-sub" id="statChampSub">Drivers' title delta</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Fastest Lap 2026</div>
-      <div class="stat-big">1:28.411</div>
-      <div class="stat-sub">Russell · Japan Q3</div>
+      <div class="stat-label">Constructors' Lead</div>
+      <div class="stat-big" id="statConGap"><em>—</em> pts</div>
+      <div class="stat-sub" id="statConSub">Teams' title delta</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Fastest Pit Stop</div>
-      <div class="stat-big">1.94<em>s</em></div>
-      <div class="stat-sub">McLaren · Japanese GP</div>
+      <div class="stat-label">Last Race Winner</div>
+      <div class="stat-big" id="statLastWinner">—</div>
+      <div class="stat-sub" id="statLastWinnerSub">Latest chequered flag</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Verstappen Gap</div>
-      <div class="stat-big">P9 <em>·</em> −60</div>
-      <div class="stat-sub">Worst start since 2017</div>
+      <div class="stat-label">Favorite Driver · Form</div>
+      <div class="stat-big" id="statFavPts">—</div>
+      <div class="stat-sub" id="statFavSub">Championship snapshot</div>
     </div>
   </div>
 </section>
@@ -2398,6 +2521,7 @@ Return the COMPLETE HTML in one code block. Preserve every
 </div>
 <!-- END COLOPHON MODAL -->
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script>
 const DEFAULT_PROFILE = {
   email: '',
@@ -2410,6 +2534,645 @@ let activeProfile = { ...DEFAULT_PROFILE };
 const AUTH_OTP_KEY = 'pitwallResetOtp';
 const AUTH_CLIP_SOURCES = ['clips/verstappen-storm.mp4', 'clips/leclerc-sunset.mp4', 'clips/schumi-classic.mp4'];
 let otpRecord = null; // { username, email, expires, code }
+
+const JOLPICA_BASE = 'https://api.jolpi.ca/ergast/f1';
+const OPENF1_BASE = 'https://api.openf1.org/v1';
+
+let liveFeedsStarted = false;
+let countdownTargetTs = null;
+let driversMetaRound = null;
+/** @type {{ drivers?:any[], constructors?:any[], calendar?:any, nextRace?:any, session?:any, news?:any[] }} */
+let liveApiCache = {};
+let telemetrySpeedChart = null;
+let telemetryThrottleChart = null;
+let telemetryPollTimer = null;
+
+function isoToMs(iso) {
+  if (!iso) return NaN;
+  const t = Date.parse(iso);
+  return Number.isFinite(t) ? t : NaN;
+}
+
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
+
+function formatMonthRange(fromIso, toIso) {
+  const a = isoToMs(fromIso);
+  const b = isoToMs(toIso);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return '';
+  const A = new Date(a);
+  const B = new Date(b);
+  const Mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if (A.getUTCMonth() === B.getUTCMonth() && A.getUTCFullYear() === B.getUTCFullYear()) {
+    return `${Mo[A.getUTCMonth()]} ${pad2(A.getUTCDate())}–${pad2(B.getUTCDate())}`;
+  }
+  return `${Mo[A.getUTCMonth()]} ${pad2(A.getUTCDate())} – ${Mo[B.getUTCMonth()]} ${pad2(B.getUTCDate())}`;
+}
+
+function flagEmojiFromCountry(country) {
+  const c = String(country || '').trim().toLowerCase();
+  const map = {
+    australia:'🇦🇺', china:'🇨🇳', japan:'🇯🇵', usa:'🇺🇸','united states':'🇺🇸', canada:'🇨🇦', monaco:'🇲🇨', spain:'🇪🇸', austria:'🇦🇹',
+    uk:'🇬🇧','united kingdom':'🇬🇧', britain:'🇬🇧', belgium:'🇧🇪', netherlands:'🇳🇱', italy:'🇮🇹', hungary:'🇭🇺', azerbaijan:'🇦🇿',
+    singapore:'🇸🇬', mexico:'🇲🇽', brazil:'🇧🇷', qatar:'🇶🇦', uae:'🇦🇪','united arab emirates':'🇦🇪', bahrain:'🇧🇭', 'saudi arabia':'🇸🇦'
+  };
+  return map[c] || '🏁';
+}
+
+function natToAbr(nat) {
+  const n = String(nat || '').toLowerCase();
+  const tbl = {
+    british:'GBR', italian:'ITA', french:'FRA', german:'DEU', spanish:'ESP', japanese:'JPN', chinese:'CHN',
+    australian:'AUS', monegasque:'MON', dutch:'NED', austrian:'AUT', mexican:'MEX', brazilian:'BRA',
+    american:'USA', argentine:'ARG', 'new zealander':'NZL', indian:'IND', danish:'DEN', swedish:'SWE'
+  };
+  return tbl[n] || (nat ? String(nat).slice(0, 3).toUpperCase() : '');
+}
+
+function shortDriverName(driver) {
+  const g = String(driver?.givenName || '').trim();
+  const f = String(driver?.familyName || '').trim();
+  if (!g && !f) return 'Driver';
+  return `${g ? g[0] + '.' : ''} ${f}`.trim();
+}
+
+function shortenTeamName(full, id) {
+  const fid = String(id || '');
+  if (fid === 'rb') return 'RB F1';
+  if (/haas/i.test(full || '')) return 'Haas F1';
+  if (/ferrari/i.test(full || '')) return 'Scuderia Ferrari';
+  if (/cadillac/i.test(full || '')) return 'Cadillac';
+  return String(full || '').replace(/\s+F1\s+Team/i, '').replace(/^Scuderia\s+/i, '').trim() || full;
+}
+
+function constructorEngineLine(id, nationality) {
+  const nat = nationality ? natToAbr(nationality) : '';
+  const map = {
+    mercedes:{pu:'Mercedes', tag:'DEU'}, ferrari:{pu:'Ferrari', tag:'ITA'}, mclaren:{pu:'Mercedes', tag:'GBR'},
+    red_bull:{pu:'Red Bull Ford', tag:'AUT'}, rb:{pu:'RB Ford', tag:'ITA'}, williams:{pu:'Mercedes', tag:'GBR'},
+    alpine:{pu:'Renault', tag:'FRA'}, haas:{pu:'Ferrari', tag:'USA'}, audi:{pu:'Audi', tag:'DEU'}, aston_martin:{pu:'Honda', tag:'GBR'}, cadillac:{pu:'Ferrari', tag:'USA'}
+  };
+  const m = map[String(id)] || { pu:'PU', tag: nat };
+  const tag = m.tag || nat;
+  return tag ? `${m.pu} PU · ${tag}` : `${m.pu} PU`;
+}
+
+function constructorCssVar(id) {
+  const v = String(id || '');
+  if (v === 'mercedes') return 'var(--mercedes)';
+  if (v === 'ferrari') return 'var(--ferrari)';
+  if (v === 'mclaren') return 'var(--mclaren)';
+  if (v === 'red_bull') return 'var(--redbull)';
+  if (v === 'rb') return 'var(--racingbulls)';
+  if (v === 'williams') return 'var(--williams)';
+  if (v === 'alpine') return 'var(--alpine)';
+  if (v === 'haas') return 'var(--haas)';
+  if (v === 'audi') return 'var(--audi)';
+  if (v === 'aston_martin') return 'var(--aston)';
+  if (v === 'cadillac') return 'var(--cadillac)';
+  return '#4a4a4a';
+}
+
+function raceTitleHtml(raceName) {
+  const raw = String(raceName || 'Grand Prix');
+  const m = raw.match(/^(.*)\s+(Grand Prix)$/i);
+  if (m) return `${m[1]} <em>${m[2]}</em>`;
+  return raw.replace(/\s+/g,' ').trim();
+}
+
+function mergeRaceDateTimeUTC(dateStr, timeStrZ) {
+  if (!dateStr) return '';
+  const t = timeStrZ && String(timeStrZ).endsWith('Z') ? String(timeStrZ).replace('Z', '') : (timeStrZ || '');
+  const iso = t ? `${dateStr}T${t}Z` : `${dateStr}T12:00:00Z`;
+  return iso;
+}
+
+async function fetchJson(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status}`);
+  return r.json();
+}
+
+function normalizedNameToken(s) {
+  return String(s || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,'')
+    .trim();
+}
+
+function findDriverPermNumberFromFavorite(favoriteDriverName, standings) {
+  const want = normalizedNameToken(favoriteDriverName);
+  if (!want || !Array.isArray(standings)) return null;
+  for (const ds of standings) {
+    const d = ds.Driver || {};
+    const cand = normalizedNameToken(`${d.givenName || ''}${d.familyName || ''}`)
+      || normalizedNameToken(d.familyName || '')
+      || normalizedNameToken(d.code || '')
+      || normalizedNameToken(ds.positionText || '');
+    if (!cand) continue;
+    if (want.includes(cand) || cand.includes(want)) {
+      const n = Number(d.permanentNumber);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    }
+  }
+  return null;
+}
+
+function setCountdownTarget(tsMs, labelText) {
+  countdownTargetTs = Number.isFinite(tsMs) ? tsMs : null;
+  const lbl = document.getElementById('countdownLabel');
+  if (lbl) lbl.textContent = labelText || 'Session Starts In';
+}
+
+function primeCountdownFromNextSession(nowMs = Date.now()) {
+  defaultCountdown(nowMs);
+}
+
+function tickCountdown() {
+  const diff = countdownTargetTs == null ? NaN : (countdownTargetTs - Date.now());
+  const pad = (n) => String(n).padStart(2, '0');
+  if (!Number.isFinite(diff) || diff <= 0) {
+    ['cd-d','cd-h','cd-m','cd-s'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '00'; });
+    return;
+  }
+  const d = document.getElementById('cd-d'); const h = document.getElementById('cd-h');
+  const m = document.getElementById('cd-m'); const sEl = document.getElementById('cd-s');
+  if (d) d.textContent = pad(Math.floor(diff / 86400000));
+  if (h) h.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+  if (m) m.textContent = pad(Math.floor((diff % 3600000) / 60000));
+  if (sEl) sEl.textContent = pad(Math.floor((diff % 60000) / 1000));
+}
+
+function defaultCountdown(nowMs) {
+  /* Fallback: countdown to NEXT.json race start UTC */
+  const next = liveApiCache.nextRace?.Races?.[0];
+  if (next?.date && next?.time) {
+    const ts = isoToMs(mergeRaceDateTimeUTC(next.date, next.time));
+    if (Number.isFinite(ts)) {
+      setCountdownTarget(ts, 'Race Starts In');
+      return;
+    }
+  }
+  setCountdownTarget(isoToMs('2026-05-03T20:00:00Z'), 'Race Starts In');
+}
+
+async function hydrateJolpicaCore() {
+  const [driversJ, constructorsJ, calendarJ, nextJ, lastJ] = await Promise.all([
+    fetchJson(`${JOLPICA_BASE}/current/driverStandings.json`),
+    fetchJson(`${JOLPICA_BASE}/current/constructorStandings.json`),
+    fetchJson(`${JOLPICA_BASE}/2026.json`),
+    fetchJson(`${JOLPICA_BASE}/current/next.json`),
+    fetchJson(`${JOLPICA_BASE}/current/last/results.json`).catch(() => null)
+  ]);
+  driversMetaRound = driversJ?.MRData?.StandingsTable?.StandingsLists?.[0]?.round ?? null;
+  liveApiCache.drivers = driversJ?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || null;
+  liveApiCache.constructors = constructorsJ?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || null;
+  liveApiCache.calendar = calendarJ?.MRData?.RaceTable?.Races || null;
+  liveApiCache.nextRace = nextJ?.MRData?.RaceTable || null;
+  liveApiCache.lastResults = lastJ?.MRData?.RaceTable || null;
+
+  renderStandings();
+  refreshStatsRibbon();
+  renderCalendarStrip();
+  updateRaceHeroBlock({ skipSessions: true });
+  updatePodium();
+  renderTicker(activeProfile);
+  syncCountdownFromSessions();
+}
+
+function renderStandings() {
+  const list = liveApiCache.drivers;
+  const roundStr = driversRoundLabel();
+  const sub = document.getElementById('driversStandingSub');
+  if (sub) sub.textContent = `Top 10 · ${roundStr}`;
+
+  const wrap = document.getElementById('driverStandings');
+  if (!wrap || !Array.isArray(list)) return;
+  const top = list.slice(0, 10);
+  wrap.innerHTML = top.map((row, idx) => {
+    const lag = gapToLeaderLabel(row.points, top[0]?.points);
+    const d = row.Driver || {};
+    const c = row.Constructors?.[0] || {};
+    const cid = c.constructorId;
+    const pts = row.points ?? '—';
+    const pos = row.positionText || row.position || String(idx + 1);
+    const nm = escapeHtml(shortDriverName(d));
+    const code = escapeHtml(String(d.code || '').toUpperCase());
+    const team = escapeHtml(shortenTeamName(c.name, cid));
+    const nat = escapeHtml(natToAbr(d.nationality));
+    const lagHtml = lag ? `<span class="gap">${escapeHtml(lag)}</span>` : '';
+    const leaderCls = idx === 0 ? 'driver-row leader' : 'driver-row';
+    const delay = (4.5 + idx * 0.08).toFixed(2);
+    return `<div class="${leaderCls}" style="--team-color:${constructorCssVar(cid)}; animation-delay:${delay}s;"><div class="driver-pos">${escapeHtml(String(pos).padStart(2,'0'))}</div>`
+      + `<div class="driver-info"><div class="driver-line"><span class="driver-name">${nm}</span>`
+      + `<span class="driver-code" style="background:${constructorCssVar(cid)};color:${cid==='mercedes'?'#000':''};">${code}</span></div>`
+      + `<div class="driver-team">${team} · ${nat}${lagHtml ? ' · ' + lagHtml : ''}</div></div>`
+      + `<div class="driver-pts-wrap"><div class="driver-pts">${escapeHtml(String(pts))}</div><div class="driver-pts-sub">pts</div></div></div>`;
+  }).join('');
+  renderConstructors();
+}
+
+function driversRoundLabel() {
+  const dr = Number(driversMetaRound);
+  if (Number.isFinite(dr) && dr > 0) return `After Round ${dr}`;
+  const nextR = Number(liveApiCache.nextRace?.Races?.[0]?.round);
+  if (!Number.isFinite(nextR)) return 'Official snapshot';
+  return `After Round ${Math.max(0, nextR - 1)}`;
+}
+
+function gapToLeaderLabel(points, leaderPts) {
+  const p = Number(points); const L = Number(leaderPts);
+  if (!Number.isFinite(p) || !Number.isFinite(L)) return '';
+  if (p === L) return 'Leader';
+  const d = p - L;
+  return (d > 0 ? '+' : '−') + Math.abs(d);
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function stripTags(htmlish) {
+  return String(htmlish || '').replace(/<[^>]+>/g, ' ');
+}
+
+function renderConstructors() {
+  const list = liveApiCache.constructors;
+  const sub = document.getElementById('constructorsStandingSub');
+  const n = Array.isArray(list) ? list.length : 0;
+  if (sub) sub.textContent = n ? `${n} teams · ${new Date().getFullYear()}` : 'Teams · loading…';
+  const wrap = document.getElementById('constructorStandings');
+  if (!wrap || !Array.isArray(list)) return;
+  const maxPts = Math.max(...list.map(r => Number(r.points) || 0), 1);
+  wrap.innerHTML = list.map((row, idx) => {
+    const c = row.Constructor || {};
+    const cid = c.constructorId;
+    const pct = Math.max(6, Math.round((Number(row.points) || 0) / maxPts * 100));
+    const delay = (4.5 + idx * 0.08).toFixed(2);
+    const barDelay = (5.5 + idx * 0.05).toFixed(2);
+    const name = escapeHtml(shortenTeamName(c.name, cid));
+    const eng = escapeHtml(constructorEngineLine(cid, c.nationality));
+    return `<div class="con-row" style="--team-color:${constructorCssVar(cid)}; animation-delay:${delay}s;">`
+      + `<div class="con-top"><div class="con-pos">${escapeHtml(String(row.positionText || row.position || idx + 1).padStart(2,'0'))}</div>`
+      + `<div><div class="con-name">${name}</div><div class="con-engine">${eng}</div></div>`
+      + `<div class="con-pts">${escapeHtml(String(row.points ?? '—'))}</div></div>`
+      + `<div class="con-bar"><div class="con-bar-fill" style="width:${pct}%; animation-delay:${barDelay}s;"></div></div></div>`;
+  }).join('');
+}
+
+function renderCalendarStrip() {
+  const races = liveApiCache.calendar;
+  const strip = document.getElementById('calStrip');
+  const meta = document.getElementById('calMetaHead');
+  const bar = document.getElementById('calProgressFill');
+  if (!strip || !Array.isArray(races)) return;
+
+  const nextRound = Number(liveApiCache.nextRace?.Races?.[0]?.round);
+  const completed = Number.isFinite(nextRound) ? nextRound - 1 : 0;
+  const total = races.length;
+  if (meta) meta.textContent = `${total} Rounds · season ${new Date().getFullYear()}`;
+  if (bar && total > 0) {
+    bar.style.width = `${Math.min(100, Math.max(6, Math.round((completed / total) * 100)))}%`;
+  }
+
+  strip.innerHTML = races.map((r, i) => {
+    const rn = Number(r.round);
+    const isNext = Number.isFinite(nextRound) ? rn === nextRound : i === completed;
+    const isDone = Number.isFinite(nextRound) ? rn < nextRound : i < completed;
+    const flag = flagEmojiFromCountry(r.Circuit?.Location?.country || '');
+    const country = escapeHtml(String(r.Circuit?.Location?.country || '').split(' ')[0] || '');
+    const cname = escapeHtml(String(r.Circuit?.circuitName || '').split(' ')[0] || '');
+    const fp = r.FirstPractice?.date ? mergeRaceDateTimeUTC(r.FirstPractice.date, r.FirstPractice.time || '12:00:00Z') : '';
+    const raceIso = mergeRaceDateTimeUTC(r.date, r.time || '12:00:00Z');
+    const range = fp && raceIso ? formatMonthRange(fp, raceIso) : '';
+
+    let statusClass = '';
+    let rlab = '';
+    if (isNext) {
+      statusClass = 'next';
+      rlab = `<div class="cal-rnum">R${escapeHtml(String(rn).padStart(2,'0'))} · NEXT<span class="cal-status-dot"></span></div>`;
+    } else if (isDone) {
+      statusClass = 'done';
+      rlab = `<div class="cal-rnum">R${escapeHtml(String(rn).padStart(2,'0'))}<span class="cal-status-dot"></span></div>`;
+    } else {
+      rlab = `<div class="cal-rnum">R${escapeHtml(String(rn).padStart(2,'0'))}<span class="cal-status-dot"></span></div>`;
+    }
+
+    let winnerHtml = '';
+    /* winners loaded lazily omitted for footprint — keep placeholders for UX */
+    winnerHtml = isDone ? '<div class="cal-winner">—</div>' : '';
+
+    return `<div class="cal-round ${statusClass}">${rlab}`
+      + `<div class="cal-flag-emoji">${flag}</div>`
+      + `<div class="cal-country">${country}</div>`
+      + `<div class="cal-flag-name">${cname}</div>`
+      + `<div class="cal-date">${escapeHtml(range)}</div>`
+      + winnerHtml + `</div>`;
+  }).join('');
+
+  setTimeout(() => {
+    const nx = strip.querySelector('.cal-round.next');
+    if (nx) strip.scrollTo({ left: nx.offsetLeft - 60, behavior:'smooth' });
+  }, 500);
+}
+
+function updateRaceHeroBlock(opts = {}) {
+  const next = liveApiCache.nextRace?.Races?.[0];
+  const title = document.getElementById('raceTitle');
+  const roundLbl = document.getElementById('raceRoundLabel');
+  const flagEl = document.getElementById('raceFlagEmoji');
+  const cir = document.getElementById('raceCircuitLine');
+  const sub = document.getElementById('raceSubtitle');
+  const s1 = document.getElementById('raceStatSession');
+  const s2 = document.getElementById('raceStatRound');
+  const s3 = document.getElementById('raceStatWeekend');
+  const ns = liveApiCache.nextSession;
+  if (!next) return;
+
+  if (title) title.innerHTML = raceTitleHtml(next.raceName);
+  if (flagEl) flagEl.textContent = flagEmojiFromCountry(next.Circuit?.Location?.country);
+  if (roundLbl) roundLbl.textContent = `◆ Round ${String(next.round).padStart(2,'0')} · Up Next`;
+
+  const locCity = next.Circuit?.Location?.locality || '';
+  const ctr = next.Circuit?.Location?.country || '';
+  const cname = next.Circuit?.circuitName || '';
+  if (cir) cir.innerHTML = `<strong>${escapeHtml(cname)}</strong>${locCity ? ' · ' + escapeHtml(locCity) : ''}`;
+
+  if (sub) {
+    const lapsNote = ''; /* optional enhancement */
+    sub.textContent = lapsNote || `Official schedule · Jolpica F1 (${ctr || 'International'})`;
+  }
+
+  if (s2) s2.textContent = `Round ${next.round}`;
+  const fp = next.FirstPractice ? mergeRaceDateTimeUTC(next.FirstPractice.date, next.FirstPractice.time) : '';
+  const rq = mergeRaceDateTimeUTC(next.date, next.time);
+  if (s3 && fp && rq) s3.textContent = formatMonthRange(fp, rq);
+
+  const sessLbl = ns ? `${ns.session_name || ns.session_type}` : '';
+  const live = liveApiCache.liveSession;
+  if (s1) s1.textContent = live ? `${live.session_name || live.session_type} · LIVE` : (sessLbl || 'Weekend timetable');
+}
+
+function updatePodium() {
+  const last = liveApiCache.lastResults?.Races?.[0];
+  const head = document.getElementById('podiumHead');
+  const listEl = document.querySelector('.podium-list');
+  if (!last || !listEl || !head) return;
+  head.textContent = `${last.raceName || 'Grand Prix'} · ${last.Circuit?.Location?.country || ''} · Result`;
+  const top = last.Results ? last.Results.slice(0, 3) : [];
+
+  listEl.innerHTML = top.map((r, idx) => {
+    const medal = idx === 0 ? 'p1' : idx === 1 ? 'p2' : 'p3';
+    const drv = `${r.Driver?.givenName || ''} ${r.Driver?.familyName || ''}`.trim();
+    const team = shortenTeamName(r.Constructor?.name, r.Constructor?.constructorId);
+    const pn = `#${r.number || ''}`;
+    const badge = idx === 0 ? 'P1' : idx === 1 ? 'P2' : 'P3';
+    const tm = escapeHtml(String(r.Time?.time || ''));
+    return `<div class="pod-row ${medal}"><div class="pod-badge">${badge}</div>`
+      + `<div><div class="pod-driver-name">${escapeHtml(drv)}</div><div class="pod-driver-team">${escapeHtml(team)} · ${escapeHtml(pn)}</div></div>`
+      + `<div class="pod-time">${tm}</div></div>`;
+  }).join('');
+}
+
+async function hydrateNewsFeed() {
+  const url = encodeURIComponent('https://feeds.bbci.co.uk/sport/formula1/rss.xml');
+  const j = await fetchJson(`https://api.rss2json.com/v1/api.json?rss_url=${url}`).catch(() => null);
+  const items = j?.items;
+  if (!Array.isArray(items) || items.length === 0) return;
+  liveApiCache.news = items.slice(0, 6);
+  const box = document.getElementById('newsBlock');
+  if (!box) return;
+  const pick = items.slice(0, 4);
+  box.innerHTML = pick.map((it, idx) => {
+    const kick = escapeHtml(idx === 0 ? 'Latest' : (it.categories?.[0] || 'F1 Desk'));
+    const link = escapeHtml(it.link || '#');
+    const title = escapeHtml(it.title || '');
+    const rawBody = stripTags(it.description || it.content || '');
+    const body = escapeHtml(rawBody.trim());
+    const num = escapeHtml(String(idx + 1).padStart(2, '0'));
+    const cls = idx === 0 ? 'news-item lead' : 'news-item neutral';
+    return `<article class="${cls}"><div class="news-meta"><span class="news-kicker">${kick}</span><span class="news-num">${num}</span></div>`
+      + `<h3 class="news-headline"><a href="${link}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;">${title}</a></h3>`
+      + `<p class="news-body">${body}</p></article>`;
+  }).join('');
+}
+
+function refreshStatsRibbon() {
+  const ds = liveApiCache.drivers;
+  const cs = liveApiCache.constructors;
+  const last = liveApiCache.lastResults?.Races?.[0];
+
+  const g1 = document.getElementById('statChampGap');
+  const s1 = document.getElementById('statChampSub');
+  if (ds && ds[0] && ds[1] && g1 && s1) {
+    const pA = Number(ds[0].points); const pB = Number(ds[1].points);
+    const dlt = Number.isFinite(pA) && Number.isFinite(pB) ? Math.abs(pA - pB) : NaN;
+    g1.innerHTML = Number.isFinite(dlt) ? `<em>${dlt === 0 ? '=' : '+' + Math.round(dlt * 10) / 10}</em> pts` : '<em>—</em>';
+    const a = `${ds[0].Driver?.familyName}`; const b = `${ds[1].Driver?.familyName}`;
+    s1.textContent = `${a} vs ${b}`;
+  }
+
+  const g2 = document.getElementById('statConGap');
+  const s2 = document.getElementById('statConSub');
+  if (cs && cs[0] && cs[1] && g2 && s2) {
+    const pA = Number(cs[0].points); const pB = Number(cs[1].points);
+    const dlt = Number.isFinite(pA) && Number.isFinite(pB) ? Math.abs(pA - pB) : NaN;
+    g2.innerHTML = Number.isFinite(dlt) ? `<em>${dlt === 0 ? '=' : '+' + Math.round(dlt * 10) / 10}</em> pts` : '<em>—</em>';
+    const a = `${shortenTeamName(cs[0].Constructor?.name, cs[0].Constructor?.constructorId)}`;
+    const b = `${shortenTeamName(cs[1].Constructor?.name, cs[1].Constructor?.constructorId)}`;
+    s2.textContent = `${a} vs ${b}`;
+  }
+
+  const w = document.getElementById('statLastWinner'); const ws = document.getElementById('statLastWinnerSub');
+  const r0 = last?.Results?.[0];
+  if (r0 && w && ws) {
+    w.textContent = `${shortDriverName(r0.Driver)}`;
+    ws.textContent = `${shortenTeamName(r0.Constructor?.name, r0.Constructor?.constructorId)} · Winner`;
+  }
+
+  const fv = document.getElementById('statFavPts'); const fs = document.getElementById('statFavSub');
+  if (fv && ds) {
+    const target = normalizedNameToken(activeProfile.favoriteDriver);
+    let row = ds.find(rr => normalizedNameToken(rr.Driver?.familyName||'')===target||normalizedNameToken(`${rr.Driver?.givenName}${rr.Driver?.familyName}`)===target);
+    if (!row) row = ds.find(rr => rr.Driver?.code && target && target.includes(rr.Driver.code.toLowerCase()));
+    if (row) {
+      fv.textContent = `${row.Driver?.code || '?'} · P${row.positionText || row.position} · ${row.points} pts`;
+      fs.textContent = `${shortDriverName(row.Driver)} · standings`;
+    } else fv.textContent = '—';
+
+  }
+
+  renderTicker(activeProfile);
+}
+
+async function fetchOpenf1SessionsWindow(centerMs = Date.now()) {
+  const d = new Date(centerMs);
+  const start = new Date(d); start.setUTCDate(start.getUTCDate() - 3);
+  const end = new Date(d); end.setUTCDate(end.getUTCDate() + 8);
+  const y = d.getUTCFullYear();
+  const s0 = `${start.toISOString().slice(0, 10)}`;
+  const s1 = `${end.toISOString().slice(0, 10)}`;
+  const qs = encodeURIComponent(`>=${s0}`);
+  const qe = encodeURIComponent(`<=${s1}`);
+  return fetchJson(`${OPENF1_BASE}/sessions?year=${y}&date_start${qs}&date_start${qe}`).catch(() => []);
+}
+
+function pickLiveAndNextSessions(sessions, nowMs = Date.now()) {
+  if (!Array.isArray(sessions)) return { live: null, next: null };
+  const active = sessions.filter(s => !s.is_cancelled && isoToMs(s.date_start) <= nowMs && nowMs <= isoToMs(s.date_end));
+
+  /* prefer sprint/race/qualy over practice live */
+  const rank = { Race: 1, Sprint: 2, Qualifying: 3, SprintQualifying: 4 };
+  active.sort((a, b) => (rank[b.session_name] ?? 99) - (rank[a.session_name] ?? 99));
+
+  let next = sessions
+    .filter(s => !s.is_cancelled && isoToMs(s.date_start) > nowMs)
+    .sort((a, b) => isoToMs(a.date_start) - isoToMs(b.date_start))[0] || null;
+  let live = active[0] || null;
+
+  /* If sprint weekend: ensure countdown targets next chronological session regardless of Jolpica's main race listing */
+  if (!next && !live && sessions.length) {
+    next = sessions.filter(s=>!s.is_cancelled).sort((a,b)=>isoToMs(a.date_start)-isoToMs(b.date_start))[0];
+  }
+  return { live, next };
+}
+
+function syncCountdownFromSessions() {
+  const nowMs = Date.now();
+  fetchOpenf1SessionsWindow(nowMs).then((sess) => {
+    liveApiCache.openSessions = sess;
+    const { live, next } = pickLiveAndNextSessions(sess, nowMs);
+    liveApiCache.liveSession = live || null;
+    liveApiCache.nextSession = next || null;
+
+    if (live) {
+      /* While on track, countdown shows time remaining in the timed session window */
+      const endTs = isoToMs(live.date_end);
+      setCountdownTarget(endTs, `${live.session_name || live.session_type} · Ends In`);
+    } else if (next) {
+      const st = isoToMs(next.date_start);
+      setCountdownTarget(st, `${next.session_name || next.session_type} · Starts In`);
+    } else {
+      defaultCountdown(nowMs);
+    }
+    renderTicker(activeProfile);
+    telemetrySchedule(live?.session_key ? live : next);
+    updateRaceHeroBlock();
+
+  }).catch(() => {
+    liveApiCache.openSessions = null;
+    liveApiCache.liveSession = null;
+    liveApiCache.nextSession = null;
+    defaultCountdown(nowMs);
+    telemetrySchedule(null);
+    renderTicker(activeProfile);
+    updateRaceHeroBlock();
+  });
+}
+
+function telemetrySchedule(sess) {
+  if (telemetryPollTimer) clearInterval(telemetryPollTimer);
+  telemetryPollTimer = null;
+  if (!sess?.session_key) {
+    telemetryIdleMessage();
+    return;
+  }
+  const pollMs = (isoToMs(sess.date_start) <= Date.now() && Date.now() <= isoToMs(sess.date_end)) ? 20000 : 120000;
+  loadTelemetryCharts(sess.session_key);
+  telemetryPollTimer = setInterval(() => loadTelemetryCharts(sess.session_key), pollMs);
+}
+
+function telemetryIdleMessage() {
+  const meta = document.getElementById('telemetryMeta');
+  const ft = document.getElementById('telemetryFootnote');
+  if (meta) meta.textContent = 'Charts appear when OpenF1 publishes car data during a timed session.';
+  if (ft) ft.textContent = '';
+
+}
+
+async function loadTelemetryCharts(sessionKey) {
+  let driverNum = findDriverPermNumberFromFavorite(activeProfile.favoriteDriver, liveApiCache.drivers || []);
+  if (!driverNum) driverNum = 16;
+  let rows = [];
+  try {
+    const rpmUrl = `${OPENF1_BASE}/car_data?session_key=${sessionKey}&driver_number=${driverNum}&rpm%3E11800`;
+    rows = await fetchJson(rpmUrl);
+  } catch (_) {
+    rows = [];
+  }
+  if (!Array.isArray(rows) || rows.length < 12) telemetryIdleMessage();
+  else {
+    rows.sort((a, b) => isoToMs(a.date) - isoToMs(b.date));
+    /* downsample to max ~140 points around high-speed segments when available */
+    const stride = Math.max(1, Math.floor(rows.length / 140));
+    const sample = rows.filter((_, i) => i % stride === 0);
+    paintTelemetryCharts(sample);
+    const meta = document.getElementById('telemetryMeta');
+    const ft = document.getElementById('telemetryFootnote');
+    if (meta) {
+      meta.textContent = `Session ${sessionKey} · Driver #${driverNum} · sampled ${sample.length}/${rows.length} points (rpm-filtered subset).`;
+    }
+    if (ft) ft.textContent = 'RPM filter keeps payloads small enough for browsers; widen the snapshot in DevTools via OpenF1 if you proxy the API.';
+  }
+}
+
+function paintTelemetryCharts(sample) {
+  if (typeof Chart === 'undefined') return;
+
+  const lab = sample.map(pt => pt.date.slice(11,19));
+  const speed = sample.map(pt => pt.speed);
+  const th = sample.map(pt => pt.throttle);
+
+  const color = getComputedStyle(document.documentElement).getPropertyValue('--racing').trim() || '#E8002D';
+
+  const speedCtx = document.getElementById('telemetrySpeedChart');
+  const thCtx = document.getElementById('telemetryThrottleChart');
+  if (!speedCtx || !thCtx) return;
+
+  if (!telemetrySpeedChart) telemetrySpeedChart = new Chart(speedCtx, {
+    type: 'line',
+    data: { labels: lab, datasets: [{ label:'km/h', data: speed, borderColor:color, tension:0.25, fill:false, borderWidth: 2, pointRadius:0 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}}, scales:{ x:{ticks:{maxTicksLimit:10}}, y:{ grace:'8%'}}}
+  }); else {
+    telemetrySpeedChart.data.labels = lab;
+    telemetrySpeedChart.data.datasets[0].data = speed;
+    telemetrySpeedChart.update('none');
+  }
+
+  const thColor = '#9ef0ff';
+  if (!telemetryThrottleChart) telemetryThrottleChart = new Chart(thCtx, {
+    type:'line',
+    data:{ labels: lab, datasets:[{ label:'%', data: th, borderColor:thColor, tension:0.25, fill:'start', borderWidth:2, pointRadius:0, backgroundColor:'rgba(158,240,255,0.06)'}]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{maxTicksLimit:10}}, y:{ suggestedMin:0, suggestedMax:100}}}
+  }); else {
+    telemetryThrottleChart.data.labels = lab;
+    telemetryThrottleChart.data.datasets[0].data = th;
+    telemetryThrottleChart.update('none');
+  }
+
+}
+
+async function bootstrapLiveFeeds() {
+  if (liveFeedsStarted) return;
+  liveFeedsStarted = true;
+  try {
+    await hydrateJolpicaCore();
+  } catch (e) {
+    console.warn('[pitwall live]', e);
+  }
+  hydrateNewsFeed().catch(()=>{});
+  setInterval(() => hydrateNewsFeed().catch(()=>{}), 10 * 60 * 1000);
+  setInterval(() => hydrateJolpicaCore().catch(()=>{}), 5 * 60 * 1000);
+  setInterval(() => syncCountdownFromSessions(), 60 * 1000);
+
+}
 
 
 function migrateUsers(users) {
@@ -2579,7 +3342,7 @@ function setupAuthBackdropVideo() {
 }
 
 function clearGuestSession() {
-  localStorage.removeItem('pitwallSession');
+  sessionStorage.removeItem('pitwallSession');
 }
 
 function applyAccentTheme(theme) {
@@ -2599,15 +3362,56 @@ function applyAccentTheme(theme) {
 function renderTicker(profile) {
   const teamCode = (profile.favoriteTeam || 'TEAM').toUpperCase();
   const driverCode = (profile.favoriteDriver || 'DRIVER').toUpperCase();
+  const ds = Array.isArray(liveApiCache.drivers) ? liveApiCache.drivers : null;
+  const cs = Array.isArray(liveApiCache.constructors) ? liveApiCache.constructors : null;
+  const next = liveApiCache.nextRace?.Races?.[0];
+  const last = liveApiCache.lastResults?.RaceTable?.Races?.[0];
+  const session = liveApiCache.liveSession || liveApiCache.nextSession;
+  let wdcSym = 'WDC'; let wdcVal = 'STANDINGS'; let wdcPts = '···';
+  if (ds && ds[0]) {
+    const d = ds[0]?.Driver || {};
+    wdcVal = String(d.code || 'P1').toUpperCase();
+    wdcPts = `${ds[0]?.points ?? '—'} pts`;
+  }
+  let wccSym = 'WCC'; let wccVal = 'TEAMS'; let wccPts = '···';
+  if (cs && cs[0]) {
+    const c = cs[0]?.Constructor?.name || 'P1';
+    wccVal = String(shortenTeamName(c, cs[0]?.Constructor?.constructorId)).toUpperCase().slice(0, 14);
+    wccPts = `${cs[0]?.points ?? '—'} pts`;
+  }
+  let nextTxt = 'NEXT';
+  let nextSub = 'RACE WKND';
+  if (next?.raceName && next?.date) {
+    nextTxt = String(next.raceName).replace(/\sGrand Prix/i, '').replace(/\s+/g,' ').toUpperCase().slice(0, 16);
+    const Mo = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const D = new Date(isoToMs(mergeRaceDateTimeUTC(next.date, next.time)) || isoToMs(`${next.date}T12:00:00Z`));
+    nextSub = `${Mo[D.getUTCMonth()]} ${pad2(D.getUTCDate())}`;
+  }
+  let sesSym = 'LIVE'; let sesLine = session ? String(session.session_name || session.session_type || '').toUpperCase().slice(0, 18) : 'NO SESSION';
+  let sesCircuit = '';
+  if (session) {
+    const loc = session.location || session.circuit_short_name || '';
+    sesCircuit = String(loc || '').slice(0, 12).toUpperCase();
+  }
+
+  let p3Sym = 'LAST'; let p3Name = 'PODIUM'; let p3Sub = '';
+  if (last?.Results?.[2]) {
+    const r = last.Results[2];
+    p3Name = String(r?.Driver?.code || 'P3').toUpperCase();
+    p3Sub = String(last?.Circuit?.circuitName || '').split(' ')[0]?.toUpperCase() || '';
+  }
+  const favEntry = ds ? ds.find(row => normalizedNameToken(`${row.Driver?.givenName||''}${row.Driver?.familyName||''}`) === normalizedNameToken(profile.favoriteDriver)
+    || normalizedNameToken(row.Driver?.familyName||'') === normalizedNameToken(profile.favoriteDriver)) : null;
+
   const items = [
     { sym:'USER', val:(profile.displayName || 'FAN').toUpperCase(), pts:'LOGGED IN' },
     { sym:'FAV', val:driverCode, pts:teamCode },
-    { sym:'WDC', val:'ANTONELLI', pts:'72 pts' },
-    { sym:'WCC', val:'MERCEDES', pts:'135 pts' },
-    { sym:'NEXT', val:'MIAMI GP', pts:'MAY 3' },
-    { sym:'P3', val:'LECLERC', pts:'JAPAN' },
-    { sym:'FL', val:'RUSSELL', pts:'1:28.411' },
-    { sym:'FAST PIT', val:'MCLAREN', pts:'1.94s' }
+    { sym:wdcSym, val:wdcVal, pts:wdcPts },
+    { sym:wccSym, val:wccVal, pts:wccPts },
+    { sym:nextTxt.slice(0,4), val:nextTxt, pts:nextSub },
+    { sym:sesSym, val:sesLine || 'FREE PRACTICE', pts: sesCircuit || 'F1' },
+    { sym:'LAST', val:p3Name, pts:p3Sub || 'RESULT' },
+    { sym:favEntry ? String(favEntry.position || '').padStart(2,'0') : 'YOU', val: favEntry ? String((favEntry.Driver?.code)||'').toUpperCase() : driverCode.slice(0,3), pts: favEntry ? `${favEntry.points} pts` : 'FAVORITE' },
   ];
   const mk = (it) => `<span class="tick"><span class="sym">${it.sym}</span> <span class="val">${it.val}</span> <span class="pts">${it.pts}</span></span><span class="tick tick-dot">◆</span>`;
   const half = items.map(mk).join('');
@@ -2643,10 +3447,10 @@ function setUsers(users) {
   localStorage.setItem('pitwallUsers', JSON.stringify(users));
 }
 function setSession(username) {
-  localStorage.setItem('pitwallSession', username);
+  sessionStorage.setItem('pitwallSession', username);
 }
 function getSession() {
-  return localStorage.getItem('pitwallSession');
+  return sessionStorage.getItem('pitwallSession');
 }
 
 function initAuth() {
@@ -2846,54 +3650,19 @@ function initAuth() {
     applyProfile(record.profile || DEFAULT_PROFILE);
   });
 
-  const sessionUser = getSession();
+  const clearSessionOnLeave = () => {
+    sessionStorage.removeItem('pitwallSession');
+    otpClear();
+  };
+  window.addEventListener('pagehide', clearSessionOnLeave);
+  window.addEventListener('beforeunload', clearSessionOnLeave);
+
   users = getUsers();
-
-  if (sessionUser === '__guest__') {
-    otpClear();
-    overlay.hidden = true;
-    applyProfile(DEFAULT_PROFILE);
-    return;
-  }
-
-  if (!sessionUser) {
-    overlay.hidden = false;
-    applyProfile(DEFAULT_PROFILE);
-    if (Object.keys(users).length === 0) setMode('signup');
-    else setMode('login');
-    return;
-  }
-
-  const rec = users[sessionUser];
-  if (rec) {
-    otpClear();
-    overlay.hidden = true;
-    applyProfile(rec.profile || DEFAULT_PROFILE);
-  } else {
-    clearGuestSession();
-    overlay.hidden = false;
-    applyProfile(DEFAULT_PROFILE);
-    setMode('signup');
-  }
+  overlay.hidden = false;
+  applyProfile(DEFAULT_PROFILE);
+  if (Object.keys(users).length === 0) setMode('signup');
+  else setMode('login');
 }
-
-(function(){
-  const target = new Date('2026-05-03T20:00:00Z').getTime();
-  const pad = (n) => String(n).padStart(2,'0');
-  function tick() {
-    const diff = target - Date.now();
-    if (diff <= 0) {
-      ['cd-d','cd-h','cd-m','cd-s'].forEach(id => document.getElementById(id).textContent = '00');
-      return;
-    }
-    document.getElementById('cd-d').textContent = pad(Math.floor(diff / 86400000));
-    document.getElementById('cd-h').textContent = pad(Math.floor((diff % 86400000) / 3600000));
-    document.getElementById('cd-m').textContent = pad(Math.floor((diff % 3600000) / 60000));
-    document.getElementById('cd-s').textContent = pad(Math.floor((diff % 60000) / 1000));
-  }
-  tick();
-  setInterval(tick, 1000);
-})();
 
 (function(){
   setTimeout(() => {
@@ -2935,6 +3704,12 @@ function initAuth() {
 })();
 
 initAuth();
+
+primeCountdownFromNextSession();
+tickCountdown();
+setInterval(tickCountdown, 1000);
+
+bootstrapLiveFeeds();
 </script>
 </body>
 </html>
