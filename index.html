@@ -1595,6 +1595,102 @@ body.colo-open { overflow: hidden; }
   padding-top: 4px;
 }
 
+/* Login + personalization gate */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10,10,10,0.82);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.auth-card {
+  width: min(540px, 100%);
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+}
+.auth-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--rule-light);
+}
+.auth-kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--racing);
+  margin-bottom: 8px;
+}
+.auth-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  line-height: 1;
+}
+.auth-title em { color: var(--racing); font-style: italic; }
+.auth-form {
+  padding: 16px 20px 20px;
+  display: grid;
+  gap: 12px;
+}
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.auth-field label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.auth-field input, .auth-field select {
+  border: 1px solid var(--rule-light);
+  background: #fff;
+  color: var(--ink);
+  padding: 10px 11px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+.auth-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 2px;
+}
+.auth-btn {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.auth-btn.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+.auth-msg {
+  font-size: 12px;
+  color: var(--ink-2);
+  min-height: 18px;
+}
+.auth-hidden { display: none !important; }
+
 @media (max-width: 560px) {
   .colo-scroll { padding: 26px 20px 20px; }
   .colo-title { font-size: 32px; }
@@ -1610,6 +1706,61 @@ body.colo-open { overflow: hidden; }
 </style>
 </head>
 <body>
+
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-head">
+      <div class="auth-kicker">Personal Garage Access</div>
+      <h2 class="auth-title">The <em>Pit Wall</em> Login</h2>
+    </div>
+    <form class="auth-form" id="authForm">
+      <div class="auth-row">
+        <div class="auth-field">
+          <label for="authUser">Username</label>
+          <input id="authUser" name="username" required autocomplete="username">
+        </div>
+        <div class="auth-field">
+          <label for="authPass">Password</label>
+          <input id="authPass" name="password" type="password" required autocomplete="current-password">
+        </div>
+      </div>
+
+      <div id="onboardFields">
+        <div class="auth-row">
+          <div class="auth-field">
+            <label for="displayName">What should we call you?</label>
+            <input id="displayName" name="displayName" value="Neel">
+          </div>
+          <div class="auth-field">
+            <label for="favoriteDriver">Favorite driver?</label>
+            <input id="favoriteDriver" name="favoriteDriver" value="Charles Leclerc">
+          </div>
+        </div>
+        <div class="auth-row">
+          <div class="auth-field">
+            <label for="favoriteTeam">Favorite team?</label>
+            <input id="favoriteTeam" name="favoriteTeam" value="Ferrari">
+          </div>
+          <div class="auth-field">
+            <label for="accentTheme">Accent theme</label>
+            <select id="accentTheme" name="accentTheme">
+              <option value="ferrari" selected>Ferrari Red</option>
+              <option value="papaya">Papaya Orange</option>
+              <option value="mercedes">Mercedes Teal</option>
+              <option value="royal">Royal Blue</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-actions">
+        <button type="submit" class="auth-btn" id="authSubmit">Create Profile</button>
+        <button type="button" class="auth-btn secondary" id="authToggle">I already have an account</button>
+      </div>
+      <p class="auth-msg" id="authMsg"></p>
+    </form>
+  </div>
+</div>
 
 <div class="ticker-wrap">
   <div class="ticker-track" id="tkTrack"></div>
@@ -1633,7 +1784,7 @@ body.colo-open { overflow: hidden; }
 
   <div class="title-wrap">
     <h1 class="hero-title">
-      <span class="line1"><span>Neel's</span></span>
+      <span class="line1"><span id="heroName">Neel's</span></span>
       <span class="line2"><span>Pit Wall.</span></span>
     </h1>
     <div class="title-underline"></div>
@@ -1641,7 +1792,7 @@ body.colo-open { overflow: hidden; }
 
   <div class="hero-sub">
     <span class="live-badge">Live Edition</span>
-    <span>Favorite Driver · Charles Leclerc · Favorite Team · Ferrari</span>
+    <span id="heroFocus">Favorite Driver · Charles Leclerc · Favorite Team · Ferrari</span>
   </div>
 </section>
 
@@ -2026,7 +2177,7 @@ Return the COMPLETE HTML in one code block. Preserve every
 
 <div class="footer-wrap">
   <footer class="footer">
-    <div class="f-note">For Neel · eyes only<span class="f-dot"></span>Lights out and away we go</div>
+    <div class="f-note" id="footerNote">For Neel · eyes only<span class="f-dot"></span>Lights out and away we go</div>
     <div class="f-brand">The <em>Pit Wall</em></div>
   </footer>
   <!-- TEMPLATE ATTRIBUTION · DO NOT MODIFY -->
@@ -2126,15 +2277,153 @@ Return the COMPLETE HTML in one code block. Preserve every
 <!-- END COLOPHON MODAL -->
 
 <script>
-(function(){
+const DEFAULT_PROFILE = {
+  displayName: 'Neel',
+  favoriteDriver: 'Charles Leclerc',
+  favoriteTeam: 'Ferrari',
+  accentTheme: 'ferrari'
+};
+let activeProfile = { ...DEFAULT_PROFILE };
+
+function applyAccentTheme(theme) {
+  const themes = {
+    ferrari:  { racing: '#E8002D', hot: '#FF2D55', deep: '#A10021' },
+    papaya:   { racing: '#FF8000', hot: '#FFA340', deep: '#C35C00' },
+    mercedes: { racing: '#27F4D2', hot: '#5FF9DE', deep: '#00A896' },
+    royal:    { racing: '#3671C6', hot: '#5D8FDD', deep: '#204A8A' }
+  };
+  const selected = themes[theme] || themes.ferrari;
+  const root = document.documentElement.style;
+  root.setProperty('--racing', selected.racing);
+  root.setProperty('--racing-hot', selected.hot);
+  root.setProperty('--racing-deep', selected.deep);
+}
+
+function renderTicker(profile) {
+  const teamCode = (profile.favoriteTeam || 'TEAM').toUpperCase();
+  const driverCode = (profile.favoriteDriver || 'DRIVER').toUpperCase();
+  const items = [
+    { sym:'USER', val:(profile.displayName || 'FAN').toUpperCase(), pts:'LOGGED IN' },
+    { sym:'FAV', val:driverCode, pts:teamCode },
+    { sym:'WDC', val:'ANTONELLI', pts:'72 pts' },
+    { sym:'WCC', val:'MERCEDES', pts:'135 pts' },
+    { sym:'NEXT', val:'MIAMI GP', pts:'MAY 3' },
+    { sym:'P3', val:'LECLERC', pts:'JAPAN' },
+    { sym:'FL', val:'RUSSELL', pts:'1:28.411' },
+    { sym:'FAST PIT', val:'MCLAREN', pts:'1.94s' }
+  ];
+  const mk = (it) => `<span class="tick"><span class="sym">${it.sym}</span> <span class="val">${it.val}</span> <span class="pts">${it.pts}</span></span><span class="tick tick-dot">◆</span>`;
+  const half = items.map(mk).join('');
+  document.getElementById('tkTrack').innerHTML = half + half;
+}
+
+function renderDateAndGreeting(profile) {
   const now = new Date();
   const h = now.getHours();
   const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('greeting').textContent = g + ', Neel';
+  document.getElementById('greeting').textContent = g + ', ' + profile.displayName;
   const D = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   document.getElementById('dateline').textContent = D[now.getDay()] + ' · ' + String(now.getDate()).padStart(2,'0') + ' ' + M[now.getMonth()] + ' · ' + now.getFullYear();
-})();
+}
+
+function applyProfile(profile) {
+  activeProfile = { ...DEFAULT_PROFILE, ...profile };
+  applyAccentTheme(activeProfile.accentTheme);
+  document.title = `${activeProfile.displayName}'s Pit Wall · Your Personal F1 2026 Dashboard`;
+  document.getElementById('heroName').textContent = `${activeProfile.displayName}'s`;
+  document.getElementById('heroFocus').textContent = `Favorite Driver · ${activeProfile.favoriteDriver} · Favorite Team · ${activeProfile.favoriteTeam}`;
+  document.getElementById('footerNote').innerHTML = `For ${activeProfile.displayName} · eyes only<span class="f-dot"></span>Lights out and away we go`;
+  renderDateAndGreeting(activeProfile);
+  renderTicker(activeProfile);
+}
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('pitwallUsers') || '{}'); }
+  catch (_) { return {}; }
+}
+function setUsers(users) {
+  localStorage.setItem('pitwallUsers', JSON.stringify(users));
+}
+function setSession(username) {
+  localStorage.setItem('pitwallSession', username);
+}
+function getSession() {
+  return localStorage.getItem('pitwallSession');
+}
+
+function initAuth() {
+  const overlay = document.getElementById('authOverlay');
+  const form = document.getElementById('authForm');
+  const toggleBtn = document.getElementById('authToggle');
+  const submitBtn = document.getElementById('authSubmit');
+  const msg = document.getElementById('authMsg');
+  const onboardFields = document.getElementById('onboardFields');
+  let mode = 'signup';
+
+  function setMode(next) {
+    mode = next;
+    const signup = mode === 'signup';
+    onboardFields.classList.toggle('auth-hidden', !signup);
+    submitBtn.textContent = signup ? 'Create Profile' : 'Login';
+    toggleBtn.textContent = signup ? 'I already have an account' : 'Create a new profile';
+    msg.textContent = signup ? 'Answer the setup questions to personalize your dashboard.' : '';
+    document.getElementById('authPass').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+  }
+
+  toggleBtn.addEventListener('click', () => setMode(mode === 'signup' ? 'login' : 'signup'));
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const username = String(fd.get('username') || '').trim().toLowerCase();
+    const password = String(fd.get('password') || '');
+    if (!username || !password) {
+      msg.textContent = 'Username and password are required.';
+      return;
+    }
+
+    const users = getUsers();
+    if (mode === 'signup') {
+      if (users[username]) {
+        msg.textContent = 'That username already exists. Switch to login.';
+        return;
+      }
+      const profile = {
+        displayName: String(fd.get('displayName') || DEFAULT_PROFILE.displayName).trim() || DEFAULT_PROFILE.displayName,
+        favoriteDriver: String(fd.get('favoriteDriver') || DEFAULT_PROFILE.favoriteDriver).trim() || DEFAULT_PROFILE.favoriteDriver,
+        favoriteTeam: String(fd.get('favoriteTeam') || DEFAULT_PROFILE.favoriteTeam).trim() || DEFAULT_PROFILE.favoriteTeam,
+        accentTheme: String(fd.get('accentTheme') || DEFAULT_PROFILE.accentTheme)
+      };
+      users[username] = { password, profile };
+      setUsers(users);
+      setSession(username);
+      overlay.hidden = true;
+      applyProfile(profile);
+      return;
+    }
+
+    const record = users[username];
+    if (!record || record.password !== password) {
+      msg.textContent = 'Invalid username or password.';
+      return;
+    }
+    setSession(username);
+    overlay.hidden = true;
+    applyProfile(record.profile || DEFAULT_PROFILE);
+  });
+
+  const sessionUser = getSession();
+  const users = getUsers();
+  if (sessionUser && users[sessionUser]) {
+    overlay.hidden = true;
+    applyProfile(users[sessionUser].profile || DEFAULT_PROFILE);
+  } else {
+    overlay.hidden = false;
+    setMode('signup');
+    applyProfile(DEFAULT_PROFILE);
+  }
+}
 
 (function(){
   const target = new Date('2026-05-03T20:00:00Z').getTime();
@@ -2152,22 +2441,6 @@ Return the COMPLETE HTML in one code block. Preserve every
   }
   tick();
   setInterval(tick, 1000);
-})();
-
-(function(){
-  const items = [
-    { sym:'FAV', val:'CHARLES LECLERC', pts:'FERRARI' },
-    { sym:'WDC', val:'ANTONELLI', pts:'72 pts' },
-    { sym:'WCC', val:'MERCEDES', pts:'135 pts' },
-    { sym:'NEXT', val:'MIAMI GP', pts:'MAY 3' },
-    { sym:'P3', val:'LECLERC', pts:'JAPAN' },
-    { sym:'FL', val:'RUSSELL', pts:'1:28.411' },
-    { sym:'FAST PIT', val:'MCLAREN', pts:'1.94s' },
-    { sym:'VER', val:'−60', pts:'P9' },
-  ];
-  const mk = (it) => `<span class="tick"><span class="sym">${it.sym}</span> <span class="val">${it.val}</span> <span class="pts">${it.pts}</span></span><span class="tick tick-dot">◆</span>`;
-  const half = items.map(mk).join('');
-  document.getElementById('tkTrack').innerHTML = half + half;
 })();
 
 (function(){
@@ -2208,6 +2481,8 @@ Return the COMPLETE HTML in one code block. Preserve every
     if (e.key === 'Escape' && !modal.hidden) close();
   });
 })();
+
+initAuth();
 </script>
 </body>
 </html>
