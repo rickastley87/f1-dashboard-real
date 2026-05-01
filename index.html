@@ -1668,6 +1668,7 @@ body.colo-open { overflow: hidden; }
   gap: 10px;
   align-items: center;
   margin-top: 2px;
+  flex-wrap: wrap;
 }
 .auth-btn {
   border: 1px solid var(--ink);
@@ -1688,6 +1689,22 @@ body.colo-open { overflow: hidden; }
   font-size: 12px;
   color: var(--ink-2);
   min-height: 18px;
+}
+.auth-link {
+  border: 0;
+  background: transparent;
+  color: var(--racing);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 0;
+}
+.auth-link:hover { color: var(--racing-hot); }
+.auth-hint {
+  font-size: 11px;
+  color: var(--ink-3);
 }
 .auth-hidden { display: none !important; }
 
@@ -1753,10 +1770,25 @@ body.colo-open { overflow: hidden; }
         </div>
       </div>
 
+      <div id="recoveryFields" class="auth-hidden">
+        <div class="auth-row">
+          <div class="auth-field">
+            <label for="recoverDriver">Recovery check · favorite driver</label>
+            <input id="recoverDriver" name="recoverDriver" placeholder="e.g. Charles Leclerc">
+          </div>
+          <div class="auth-field">
+            <label for="recoverTeam">Recovery check · favorite team</label>
+            <input id="recoverTeam" name="recoverTeam" placeholder="e.g. Ferrari">
+          </div>
+        </div>
+      </div>
+
       <div class="auth-actions">
         <button type="submit" class="auth-btn" id="authSubmit">Create Profile</button>
         <button type="button" class="auth-btn secondary" id="authToggle">I already have an account</button>
+        <button type="button" class="auth-link" id="authForgot">Forgot password?</button>
       </div>
+      <p class="auth-hint" id="authHint">Tip: create once, then next time just login.</p>
       <p class="auth-msg" id="authMsg"></p>
     </form>
   </div>
@@ -2356,22 +2388,48 @@ function initAuth() {
   const overlay = document.getElementById('authOverlay');
   const form = document.getElementById('authForm');
   const toggleBtn = document.getElementById('authToggle');
+  const forgotBtn = document.getElementById('authForgot');
   const submitBtn = document.getElementById('authSubmit');
   const msg = document.getElementById('authMsg');
+  const hint = document.getElementById('authHint');
   const onboardFields = document.getElementById('onboardFields');
+  const recoveryFields = document.getElementById('recoveryFields');
+  const userInput = document.getElementById('authUser');
+  const passInput = document.getElementById('authPass');
+  const passLabel = document.querySelector('label[for="authPass"]');
+  const recoverDriver = document.getElementById('recoverDriver');
+  const recoverTeam = document.getElementById('recoverTeam');
   let mode = 'signup';
 
   function setMode(next) {
     mode = next;
-    const signup = mode === 'signup';
+    const signup = mode === 'signup', forgot = mode === 'forgot';
     onboardFields.classList.toggle('auth-hidden', !signup);
-    submitBtn.textContent = signup ? 'Create Profile' : 'Login';
+    recoveryFields.classList.toggle('auth-hidden', !forgot);
+    submitBtn.textContent = signup ? 'Create Profile' : (forgot ? 'Reset & Login' : 'Login');
     toggleBtn.textContent = signup ? 'I already have an account' : 'Create a new profile';
+    forgotBtn.textContent = forgot ? 'Back to login' : 'Forgot password?';
+    passLabel.textContent = forgot ? 'New Password' : 'Password';
+    passInput.setAttribute('autocomplete', (signup || forgot) ? 'new-password' : 'current-password');
+    hint.textContent = signup
+      ? 'Tip: create once, then next time just login.'
+      : (forgot ? 'We will verify your saved favorites before resetting.' : 'Welcome back. Enter your details to continue.');
     msg.textContent = signup ? 'Answer the setup questions to personalize your dashboard.' : '';
-    document.getElementById('authPass').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+    if (!forgot) {
+      recoverDriver.value = '';
+      recoverTeam.value = '';
+    }
+    requestAnimationFrame(() => (userInput.value ? passInput : userInput).focus());
   }
 
   toggleBtn.addEventListener('click', () => setMode(mode === 'signup' ? 'login' : 'signup'));
+  forgotBtn.addEventListener('click', () => setMode(mode === 'forgot' ? 'login' : 'forgot'));
+
+  userInput.addEventListener('blur', () => {
+    if (!userInput.value.trim()) return;
+    const users = getUsers();
+    if (users[userInput.value.trim().toLowerCase()] && mode === 'signup') setMode('login');
+  });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -2384,6 +2442,29 @@ function initAuth() {
     }
 
     const users = getUsers();
+    if (mode === 'forgot') {
+      const record = users[username];
+      if (!record) {
+        msg.textContent = 'User not found. Check username or create a new profile.';
+        return;
+      }
+      const rd = String(fd.get('recoverDriver') || '').trim().toLowerCase();
+      const rt = String(fd.get('recoverTeam') || '').trim().toLowerCase();
+      const pd = String(record.profile?.favoriteDriver || '').trim().toLowerCase();
+      const pt = String(record.profile?.favoriteTeam || '').trim().toLowerCase();
+      if (!rd || !rt || rd !== pd || rt !== pt) {
+        msg.textContent = 'Recovery answers do not match this user profile.';
+        return;
+      }
+      record.password = password;
+      users[username] = record;
+      setUsers(users);
+      setSession(username);
+      overlay.hidden = true;
+      applyProfile(record.profile || DEFAULT_PROFILE);
+      return;
+    }
+
     if (mode === 'signup') {
       if (users[username]) {
         msg.textContent = 'That username already exists. Switch to login.';
@@ -2420,7 +2501,13 @@ function initAuth() {
     applyProfile(users[sessionUser].profile || DEFAULT_PROFILE);
   } else {
     overlay.hidden = false;
-    setMode('signup');
+    const knownUsers = Object.keys(users);
+    if (knownUsers.length > 0) {
+      userInput.value = knownUsers[0];
+      setMode('login');
+    } else {
+      setMode('signup');
+    }
     applyProfile(DEFAULT_PROFILE);
   }
 }
