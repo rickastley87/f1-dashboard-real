@@ -730,13 +730,24 @@ body {
   border-right: 1px solid var(--rule-light);
   position: relative;
   background: var(--paper);
-  transition: background 0.25s, transform 0.25s;
+  transition: background 0.25s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   min-height: 148px;
   display: flex;
   flex-direction: column;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
-.cal-round:hover { background: var(--paper-3); }
+a.cal-round { outline-offset: 2px; }
+a.cal-round:visited { color: inherit; }
+a.cal-round.next:visited { color: #fff; }
+a.cal-round:focus-visible {
+  outline: 2px solid var(--racing);
+  z-index: 2;
+}
+.cal-round:hover { background: var(--paper-3); transform: translateY(-2px); }
+.cal-round:active { transform: translateY(0); }
 .cal-round:last-child { border-right: none; }
 
 .cal-round.done { background: var(--paper-2); }
@@ -1119,599 +1130,8 @@ body {
   .cal-flag-name { font-size: 15px; }
 }
 
-/* ================================================================
-   FOOTER COLOPHON ROW + COLOPHON MODAL · GO LIVE SECTION
-   Template attribution styling. Matches carbon + racing red aesthetic.
-   DO NOT MODIFY unless you know what you're doing.
-   ================================================================ */
-
-.f-colophon-row {
-  max-width: 1440px;
-  margin: 20px auto 0;
-  padding-top: 14px;
-  border-top: 1px dashed var(--rule-light);
-  display: flex;
-  justify-content: center;
-}
-.f-colophon-btn {
-  background: transparent;
-  border: 0;
-  color: var(--ink-3);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 500;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  padding: 6px 10px;
-  cursor: pointer;
-  border-bottom: 1px dashed rgba(10,10,10,0.22);
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-.f-colophon-btn:hover,
-.f-colophon-btn:focus-visible {
-  color: var(--racing);
-  border-bottom-color: var(--racing);
-  outline: none;
-}
-
-/* --- Go Live section in the main layout --------------------------- */
-
-.golive-section {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 36px 40px;
-}
-.golive-card {
-  background: var(--carbon);
-  color: var(--paper);
-  border: 2px solid var(--ink);
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 0;
-}
-.golive-stripe {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--racing) 0 40px,
-    var(--paper) 40px 80px
-  );
-}
-.golive-left {
-  padding: 38px 34px 32px;
-  border-right: 1px solid rgba(242,236,224,0.12);
-}
-.golive-eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--racing-hot);
-  margin-bottom: 14px;
-}
-.golive-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(32px, 4vw, 44px);
-  font-weight: 500;
-  line-height: 1.02;
-  margin-bottom: 12px;
-}
-.golive-title em { color: var(--racing-hot); font-style: italic; font-weight: 400; }
-.golive-lede {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  color: rgba(242,236,224,0.74);
-  max-width: 40ch;
-}
-.golive-right {
-  padding: 32px 34px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.golive-step {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 18px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(242,236,224,0.08);
-}
-.golive-step:last-child { border-bottom: none; padding-bottom: 0; }
-.golive-step-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  color: var(--racing-hot);
-  border-right: 1px solid rgba(242,236,224,0.18);
-  padding-right: 14px;
-  align-self: start;
-}
-.golive-step-head {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--paper);
-  margin-bottom: 4px;
-}
-.golive-step-head em {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--racing-hot);
-  margin-left: 10px;
-}
-.golive-step-body {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  line-height: 1.55;
-  color: rgba(242,236,224,0.66);
-}
-.golive-step-body code {
-  background: rgba(242,236,224,0.08);
-  color: var(--paper);
-  padding: 1px 6px;
-  border-radius: 2px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-}
-.golive-cta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 6px;
-}
-.golive-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border-radius: 0;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-}
-.golive-cta-primary {
-  background: var(--racing);
-  color: var(--paper);
-  border: 1px solid var(--racing);
-}
-.golive-cta-primary:hover {
-  background: var(--racing-hot);
-  border-color: var(--racing-hot);
-  transform: translateY(-1px);
-}
-.golive-cta-ghost {
-  background: transparent;
-  color: var(--paper);
-  border: 1px solid rgba(242,236,224,0.3);
-}
-.golive-cta-ghost:hover {
-  border-color: var(--paper);
-  background: rgba(242,236,224,0.06);
-}
-@media (max-width: 880px) {
-  .golive-card { grid-template-columns: 1fr; }
-  .golive-left { border-right: none; border-bottom: 1px solid rgba(242,236,224,0.12); }
-  .golive-section { padding: 0 20px 32px; }
-}
-
-/* Inline expandable detail blocks · "show the prompt" / "show the setup" */
-.golive-details {
-  margin-top: 10px;
-}
-.golive-details summary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  list-style: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--racing-hot);
-  padding: 4px 0;
-  transition: color 0.2s ease;
-}
-.golive-details summary::-webkit-details-marker { display: none; }
-.golive-details summary::before {
-  content: '+';
-  display: inline-block;
-  width: 12px;
-  font-size: 13px;
-  line-height: 1;
-}
-.golive-details[open] summary::before { content: '−'; }
-.golive-details summary:hover { color: var(--paper); }
-.golive-detail-p {
-  font-family: 'Inter', sans-serif;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: rgba(242,236,224,0.74);
-  margin: 12px 0 8px;
-}
-.golive-detail-p strong { color: var(--paper); font-weight: 600; }
-.golive-detail-p code {
-  background: rgba(242,236,224,0.08);
-  color: var(--paper);
-  padding: 1px 5px;
-  border-radius: 2px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
-}
-.golive-pre {
-  margin: 8px 0 4px;
-  padding: 14px 16px;
-  background: rgba(0,0,0,0.4);
-  border-left: 2px solid var(--racing);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  line-height: 1.55;
-  color: rgba(242,236,224,0.88);
-  white-space: pre;
-  overflow-x: auto;
-  letter-spacing: 0.005em;
-}
-.golive-pre::-webkit-scrollbar { height: 6px; }
-.golive-pre::-webkit-scrollbar-thumb { background: rgba(242,236,224,0.18); }
-
-/* --- Colophon modal ---------------------------------------------- */
-
-.colophon-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.28s ease;
-}
-.colophon-modal.open { opacity: 1; pointer-events: auto; }
-.colophon-modal[hidden] { display: none; }
-body.colo-open { overflow: hidden; }
-
-.colo-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(10,10,10,0.72);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-.colo-card {
-  position: relative;
-  width: min(620px, 100%);
-  max-height: min(88vh, 880px);
-  display: flex;
-  flex-direction: column;
-  background: var(--paper);
-  color: var(--ink);
-  border: 2px solid var(--ink);
-  overflow: hidden;
-  transform: translateY(14px) scale(0.985);
-  transition: transform 0.32s ease;
-}
-.colophon-modal.open .colo-card { transform: translateY(0) scale(1); }
-.colo-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: repeating-linear-gradient(90deg, var(--carbon) 0 20px, var(--paper-2) 20px 40px);
-}
-.colo-close {
-  position: absolute;
-  top: 14px; right: 14px;
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent;
-  border: 1px solid rgba(10,10,10,0.18);
-  color: var(--ink-2);
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-  z-index: 3;
-}
-.colo-close:hover { background: var(--carbon); color: var(--paper); border-color: var(--carbon); }
-
-.colo-scroll { overflow-y: auto; padding: 32px 30px 24px; }
-.colo-head { margin-bottom: 12px; }
-.colo-eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--racing);
-  margin-bottom: 8px;
-}
-.colo-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 42px;
-  font-weight: 500;
-  line-height: 1.02;
-  margin-bottom: 8px;
-}
-.colo-title em { color: var(--racing); font-style: italic; font-weight: 400; }
-.colo-sub {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 15px;
-  color: var(--ink-2);
-  line-height: 1.4;
-}
-
-.colo-rule {
-  height: 0;
-  border-top: 1px solid var(--ink);
-  margin: 20px 0;
-  position: relative;
-}
-.colo-rule::after {
-  content: '◆';
-  position: absolute;
-  top: -10px; left: 50%;
-  transform: translateX(-50%);
-  background: var(--paper);
-  padding: 0 10px;
-  font-size: 10px;
-  color: var(--racing);
-}
-
-.colo-author-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-bottom: 6px;
-}
-.colo-author-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-.colo-author-bio {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ink-2);
-  margin-bottom: 14px;
-  max-width: 54ch;
-}
-.colo-author-bio em {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  color: var(--racing);
-}
-.colo-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.colo-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  text-decoration: none;
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--ink);
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-.colo-btn:hover {
-  background: var(--ink);
-  color: var(--paper);
-  transform: translateY(-1px);
-}
-.colo-btn-primary {
-  background: var(--racing);
-  color: var(--paper);
-  border-color: var(--racing);
-}
-.colo-btn-primary:hover {
-  background: var(--racing-hot);
-  border-color: var(--racing-hot);
-  color: var(--paper);
-}
-.colo-arr { font-size: 13px; letter-spacing: 0; }
-
-/* Tip section ----------------------------------------------------- */
-
-.colo-tip-head {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1.15;
-  margin: 6px 0 10px;
-}
-.colo-tip-head em { color: var(--racing); font-style: italic; font-weight: 400; }
-.colo-tip-body {
-  font-family: 'Inter', sans-serif;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--ink-2);
-  max-width: 54ch;
-  margin-bottom: 16px;
-}
-
-.colo-podium {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.colo-p {
-  position: relative;
-  border: 1px solid var(--ink);
-  padding: 14px 10px 12px;
-  text-align: center;
-  background: var(--paper-2);
-  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-}
-.colo-p:hover {
-  background: var(--paper-3);
-  border-color: var(--racing);
-  transform: translateY(-1px);
-}
-.colo-p-pos {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  padding: 3px 8px;
-  border: 1px solid var(--ink);
-  margin-bottom: 8px;
-  color: var(--ink);
-}
-.colo-p[data-pos="p1"] .colo-p-pos { background: var(--gold); border-color: var(--gold); }
-.colo-p[data-pos="p3"] .colo-p-pos { background: var(--racing); color: var(--paper); border-color: var(--racing); }
-.colo-p-val {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1;
-}
-.colo-p-lbl {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8.5px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-top: 6px;
-}
-.colo-p-any {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 12.5px;
-  color: var(--ink-3);
-  text-align: center;
-  grid-column: 1 / -1;
-  padding: 4px;
-}
-
-.colo-upi {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 18px;
-  align-items: center;
-  padding: 16px;
-  background: var(--carbon);
-  color: var(--paper);
-  border: 1px solid var(--ink);
-  margin-bottom: 10px;
-}
-.colo-upi-left { min-width: 0; }
-.colo-upi-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--racing-hot);
-  display: block;
-  margin-bottom: 4px;
-}
-.colo-upi-id {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--paper);
-  word-break: break-all;
-  display: block;
-  letter-spacing: 0.04em;
-}
-.colo-upi-scan {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  color: rgba(242,236,224,0.52);
-  margin-top: 8px;
-}
-.colo-upi-qr {
-  width: 120px;
-  height: 120px;
-  background: var(--paper);
-  border: 2px solid var(--paper);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-}
-.colo-upi-qr img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.colo-upi-qr-empty { display: none; }
-.colo-upi-qr-fallback {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--carbon);
-  text-align: center;
-  padding: 8px;
-}
-.colo-intl {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 13px;
-  color: var(--ink-2);
-  text-align: center;
-  margin: 12px 0 0;
-  line-height: 1.5;
-}
-.colo-intl a {
-  color: var(--racing);
-  text-decoration: none;
-  border-bottom: 1px dashed currentColor;
-  font-style: normal;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
-  letter-spacing: 0.06em;
-  padding: 0 2px;
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-.colo-intl a:hover { color: var(--racing-hot); border-bottom-color: var(--racing-hot); }
-
-.colo-tip-sig {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 12.5px;
-  color: var(--ink-3);
-  text-align: center;
-  margin-top: 10px;
-}
-
-/* Disclaimer at bottom */
-.colo-disclaimer {
-  font-family: 'Inter', sans-serif;
-  font-size: 11.5px;
-  line-height: 1.6;
-  color: var(--ink-3);
-  letter-spacing: 0.01em;
-  padding-top: 4px;
+@view-transition {
+  navigation: auto;
 }
 
 /* Login + personalization gate */
@@ -1887,25 +1307,12 @@ body.colo-open { overflow: hidden; }
 }
 .auth-hidden { display: none !important; }
 
-@media (max-width: 560px) {
-  .colo-scroll { padding: 26px 20px 20px; }
-  .colo-title { font-size: 32px; }
-  .colo-author-name { font-size: 22px; }
-  .colo-tip-head { font-size: 18px; }
-  .colo-upi { grid-template-columns: 1fr; }
-  .colo-upi-qr { width: 100%; max-width: 200px; height: auto; aspect-ratio: 1; margin: 0 auto; }
-  .colo-podium { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-  .colo-p { padding: 10px 6px 9px; }
-  .colo-p-val { font-size: 18px; }
-}
-
 @media (max-width: 620px) {
   .auth-bg-video-wrap {
     inset: -10%;
     opacity: 0.38;
   }
 }
-/* ================ END COLOPHON STYLES ====================== */
 </style>
 </head>
 <body>
@@ -2322,112 +1729,6 @@ body.colo-open { overflow: hidden; }
   </div>
 </section>
 
-<!-- GO LIVE SECTION · data upgrade paths · DO NOT MODIFY CTAs -->
-<section class="golive-section">
-  <div class="golive-card">
-    <div class="golive-stripe" aria-hidden="true"></div>
-    <div class="golive-left">
-      <div class="golive-eyebrow">§ 04 · Go Live</div>
-      <h2 class="golive-title">Make it <em>auto-update</em>.</h2>
-      <p class="golive-lede">
-        Right now this dashboard is a snapshot — you update the numbers after each race. When you're ready, there are three paths to real-time data pulled straight from the F1 API after every checkered flag.
-      </p>
-    </div>
-    <div class="golive-right">
-
-      <div class="golive-step">
-        <div class="golive-step-num">01</div>
-        <div>
-          <div class="golive-step-head">Manual <em>· 2 min after each race</em></div>
-          <div class="golive-step-body">
-            Open <code>index.html</code> in any text editor. Find a driver's name (e.g. <code>Antonelli</code>), update the number a few lines below it (e.g. <code>72</code> &rarr; <code>97</code>). Save. Redeploy. Good for fans who only watch the majors.
-          </div>
-        </div>
-      </div>
-
-      <div class="golive-step">
-        <div class="golive-step-num">02</div>
-        <div>
-          <div class="golive-step-head">Semi-auto <em>· 30 sec via AI</em></div>
-          <div class="golive-step-body">
-            Paste the file into Claude or ChatGPT with this prompt &mdash; it does the rest.
-          </div>
-          <details class="golive-details">
-            <summary>show the prompt</summary>
-<pre class="golive-pre">Update my F1 dashboard after the [RACE NAME] GP.
-
-New driver standings (top 10):
-1. Antonelli &mdash; 97
-2. Russell &mdash; 84
-3. Leclerc &mdash; 68
-&hellip;
-
-New constructor totals:
-Mercedes 181, Ferrari 124, McLaren &hellip;
-
-New podium for "Last Race":
-P1 [Driver] &mdash; [Team] &mdash; [Time]
-P2 &hellip; (gap)
-P3 &hellip; (gap)
-
-Update the countdown to the next race.
-Return the COMPLETE HTML in one code block. Preserve every
-&lt;!-- DO NOT MODIFY --&gt; block exactly as-is.</pre>
-          </details>
-        </div>
-      </div>
-
-      <div class="golive-step">
-        <div class="golive-step-num">03</div>
-        <div>
-          <div class="golive-step-head">Full auto <em>· public API, no manual edits</em></div>
-          <div class="golive-step-body">
-            Hook the dashboard to a public F1 data API. Standings update on their own once a race is over &mdash; no touching the file again for the rest of the season.
-          </div>
-          <details class="golive-details">
-            <summary>show the setup</summary>
-            <p class="golive-detail-p"><strong>Easiest path &middot; Jolpica F1 (Ergast successor, CORS-enabled).</strong> Add this script tag near the bottom of the file, just before the closing <code>&lt;/body&gt;</code>. It fetches once on load and overwrites the hardcoded driver points in place:</p>
-<pre class="golive-pre">&lt;script&gt;
-(async function () {
-  try {
-    const r = await fetch('https://api.jolpi.ca/ergast/f1/current/driverStandings.json');
-    const j = await r.json();
-    const list = j.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
-    document.querySelectorAll('.driver-row').forEach((row, i) =&gt; {
-      const d = list[i];
-      if (!d) return;
-      const pts = row.querySelector('.driver-pts');
-      if (pts) pts.textContent = d.points;
-    });
-  } catch (e) { /* network blip &mdash; keep the static template */ }
-})();
-&lt;/script&gt;</pre>
-            <p class="golive-detail-p"><strong>More powerful &middot; OpenF1 + a tiny proxy.</strong> OpenF1 has live timing data (laps, pit stops, positions during a session) but doesn't expose CORS. A 30-line Cloudflare Worker fixes that and adds a 10-minute cache. The Worker quickstart link below has everything; the transformation logic mirrors the snippet above.</p>
-            <p class="golive-detail-p"><strong>Python path &middot; FastF1 + GitHub Actions.</strong> Prefer Python? Use the FastF1 library to write a JSON snapshot, commit it via a GitHub Action on a daily cron, and have the dashboard fetch the JSON. Same idea, different stack.</p>
-          </details>
-        </div>
-      </div>
-
-      <div class="golive-cta-row">
-        <a class="golive-cta golive-cta-ghost" href="https://api.jolpi.ca/ergast/" target="_blank" rel="noopener noreferrer">
-          Jolpica F1 API
-        </a>
-        <a class="golive-cta golive-cta-ghost" href="https://openf1.org/" target="_blank" rel="noopener noreferrer">
-          OpenF1 docs
-        </a>
-        <a class="golive-cta golive-cta-ghost" href="https://docs.fastf1.dev/" target="_blank" rel="noopener noreferrer">
-          FastF1 (Python)
-        </a>
-        <a class="golive-cta golive-cta-ghost" href="https://developers.cloudflare.com/workers/get-started/quickstarts/" target="_blank" rel="noopener noreferrer">
-          Cloudflare Workers
-        </a>
-      </div>
-
-    </div>
-  </div>
-</section>
-<!-- END GO LIVE SECTION -->
-
 <section class="stats-ribbon">
   <div class="stats-grid">
     <div class="stat">
@@ -2458,101 +1759,7 @@ Return the COMPLETE HTML in one code block. Preserve every
     <div class="f-note" id="footerNote">For Neel · eyes only<span class="f-dot"></span>Lights out and away we go</div>
     <div class="f-brand">The <em>Pit Wall</em></div>
   </footer>
-  <!-- TEMPLATE ATTRIBUTION · DO NOT MODIFY -->
-  <div class="f-colophon-row">
-    <button type="button" class="f-colophon-btn" id="openColophon" aria-haspopup="dialog" aria-controls="colophon-modal">
-      <span>Credits</span>
-    </button>
-  </div>
-  <!-- END TEMPLATE ATTRIBUTION -->
 </div>
-
-<!-- COLOPHON MODAL · Template attribution + tip jar · DO NOT MODIFY -->
-<div class="colophon-modal" id="colophon-modal" role="dialog" aria-modal="true" aria-labelledby="colo-title" hidden>
-  <div class="colo-backdrop" data-close></div>
-  <div class="colo-card" role="document">
-    <button type="button" class="colo-close" aria-label="Close">✕</button>
-    <div class="colo-scroll">
-
-      <header class="colo-head">
-        <div class="colo-eyebrow">◆ Credits</div>
-        <h2 class="colo-title" id="colo-title">The <em>Pit Wall</em></h2>
-        <p class="colo-sub">First made for my friend Neel. Now yours, too.</p>
-      </header>
-
-      <div class="colo-rule" aria-hidden="true"></div>
-
-      <section class="colo-author-sec">
-        <p class="colo-author-bio">
-          I'm <strong>Anirudh</strong>. I make dashboards for the things I love — cricket, Formula 1, whatever my friends fall asleep scrolling. If this one made your weekend better, that's enough.
-        </p>
-        <div class="colo-links">
-          <a class="colo-btn" href="https://anirudhgoel.xyz" target="_blank" rel="noopener noreferrer">
-            anirudhgoel.xyz <span class="colo-arr">→</span>
-          </a>
-          <a class="colo-btn" href="https://instagram.com/anirudh.nocode" target="_blank" rel="noopener noreferrer">
-            @anirudh.nocode <span class="colo-arr">→</span>
-          </a>
-        </div>
-      </section>
-
-      <div class="colo-rule" aria-hidden="true"></div>
-
-      <section class="colo-tip-sec">
-        <div class="colo-author-label">Pit Crew Support</div>
-        <h3 class="colo-tip-head">If this made your race weekend, <em>pit us in</em>.</h3>
-        <p class="colo-tip-body">
-          No ads, no subscriptions, no accounts — that's the promise, and I want to keep it. A small tip keeps the garage lights on and tells me it's worth building more of these.
-        </p>
-
-        <div class="colo-podium">
-          <div class="colo-p" data-pos="p10">
-            <div class="colo-p-pos">P10</div>
-            <div class="colo-p-val">₹100</div>
-            <div class="colo-p-lbl">Points finish</div>
-          </div>
-          <div class="colo-p" data-pos="p3">
-            <div class="colo-p-pos">P3</div>
-            <div class="colo-p-val">₹300</div>
-            <div class="colo-p-lbl">Podium</div>
-          </div>
-          <div class="colo-p" data-pos="p1">
-            <div class="colo-p-pos">P1</div>
-            <div class="colo-p-val">₹500</div>
-            <div class="colo-p-lbl">Race winner</div>
-          </div>
-          <div class="colo-p-any">or whatever feels right — every contribution helps</div>
-        </div>
-
-        <div class="colo-upi">
-          <div class="colo-upi-left">
-            <span class="colo-upi-label">UPI</span>
-            <code class="colo-upi-id">7814769892@yescred</code>
-            <div class="colo-upi-scan">Paste into any UPI app · PhonePe · GPay · Paytm · BHIM</div>
-          </div>
-          <div class="colo-upi-qr" id="colo-upi-qr">
-            <img src="https://pavilion.anirudhgoyal55.workers.dev/assets/upi-qr.png"
-                 alt="UPI QR code — Anirudh Goel"
-                 loading="lazy" decoding="async"
-                 onerror="document.getElementById('colo-upi-qr').classList.add('colo-upi-qr-empty'); this.remove();" />
-          </div>
-        </div>
-        <p class="colo-intl">
-          Outside India? <a href="https://ko-fi.com/anirudhgoel" target="_blank" rel="noopener noreferrer">tip via Ko-fi</a> &mdash; cards, PayPal, any currency.
-        </p>
-        <p class="colo-tip-sig">Every tip gets a thank-you in the next commit message. No joke.</p>
-      </section>
-
-      <div class="colo-rule" aria-hidden="true"></div>
-
-      <p class="colo-disclaimer">
-        The Pit Wall is an unofficial fan project. Not affiliated with, endorsed by, or associated with Formula 1, the FIA, FOM, or any team. Driver and team names used for identification only.
-      </p>
-
-    </div>
-  </div>
-</div>
-<!-- END COLOPHON MODAL -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script>
@@ -2867,10 +2074,11 @@ function renderCalendarStrip() {
   const bar = document.getElementById('calProgressFill');
   if (!strip || !Array.isArray(races)) return;
 
+  const season = String(races[0]?.season || new Date().getFullYear());
   const nextRound = Number(liveApiCache.nextRace?.Races?.[0]?.round);
   const completed = Number.isFinite(nextRound) ? nextRound - 1 : 0;
   const total = races.length;
-  if (meta) meta.textContent = `${total} Rounds · season ${new Date().getFullYear()}`;
+  if (meta) meta.textContent = `${total} Rounds · season ${season}`;
   if (bar && total > 0) {
     bar.style.width = `${Math.min(100, Math.max(6, Math.round((completed / total) * 100)))}%`;
   }
@@ -2902,16 +2110,17 @@ function renderCalendarStrip() {
     /* winners loaded lazily omitted for footprint — keep placeholders for UX */
     winnerHtml = isDone ? '<div class="cal-winner">—</div>' : '';
 
-    return `<div class="cal-round ${statusClass}">${rlab}`
+    const href = `race.html?round=${encodeURIComponent(String(rn))}&season=${encodeURIComponent(season)}`;
+    return `<a class="cal-round ${statusClass}" href="${href}">${rlab}`
       + `<div class="cal-flag-emoji">${flag}</div>`
       + `<div class="cal-country">${country}</div>`
       + `<div class="cal-flag-name">${cname}</div>`
       + `<div class="cal-date">${escapeHtml(range)}</div>`
-      + winnerHtml + `</div>`;
+      + winnerHtml + `</a>`;
   }).join('');
 
   setTimeout(() => {
-    const nx = strip.querySelector('.cal-round.next');
+    const nx = strip.querySelector('a.cal-round.next');
     if (nx) strip.scrollTo({ left: nx.offsetLeft - 60, behavior:'smooth' });
   }, 500);
 }
@@ -3778,40 +2987,24 @@ function initAuth() {
 
 (function(){
   setTimeout(() => {
-    const next = document.querySelector('.cal-round.next');
-    if (next) {
-      const strip = document.getElementById('calStrip');
-      strip.scrollTo({ left: next.offsetLeft - 60, behavior: 'smooth' });
-    }
+    const next = document.querySelector('a.cal-round.next, .cal-round.next');
+    const strip = document.getElementById('calStrip');
+    if (next && strip) strip.scrollTo({ left: next.offsetLeft - 60, behavior: 'smooth' });
   }, 5000);
 })();
 
-/* ================================================================
-   COLOPHON MODAL · open/close · DO NOT MODIFY
-   ================================================================ */
 (function(){
-  const modal   = document.getElementById('colophon-modal');
-  const openBtn = document.getElementById('openColophon');
-  const closeBtn= modal && modal.querySelector('.colo-close');
-  const backdrop= modal && modal.querySelector('.colo-backdrop');
-  if (!modal || !openBtn) return;
-
-  function open() {
-    modal.hidden = false;
-    requestAnimationFrame(() => modal.classList.add('open'));
-    document.body.classList.add('colo-open');
-    if (closeBtn) closeBtn.focus();
-  }
-  function close() {
-    modal.classList.remove('open');
-    document.body.classList.remove('colo-open');
-    setTimeout(() => { modal.hidden = true; }, 300);
-  }
-  openBtn.addEventListener('click', open);
-  closeBtn && closeBtn.addEventListener('click', close);
-  backdrop && backdrop.addEventListener('click', close);
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape' && !modal.hidden) close();
+  const strip = document.getElementById('calStrip');
+  if (!strip) return;
+  strip.addEventListener('click', function(e) {
+    const a = e.target.closest('a.cal-round');
+    if (!a || !a.href) return;
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (typeof document.startViewTransition !== 'function') return;
+    e.preventDefault();
+    document.startViewTransition(function() {
+      window.location.assign(a.href);
+    });
   });
 })();
 
