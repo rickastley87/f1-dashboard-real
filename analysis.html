@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Pit Briefing · Pit Wall</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --carbon: #0a0a0a;
+      --paper: #f2ece0;
+      --racing: #E8002D;
+      --racing-hot: #FF2D55;
+      --ink: #0a0a0a;
+      --ink-2: #4a4438;
+      --ink-3: #8a8172;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 28px 22px 80px; }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .back {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid var(--ink);
+      padding: 10px 16px;
+      background: #fff;
+    }
+    .back:hover { background: var(--carbon); color: #fff; border-color: var(--carbon); }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(28px, 5vw, 40px);
+      letter-spacing: -0.02em;
+    }
+    h1 em { font-style: italic; color: var(--racing); font-weight: 600; }
+
+    .loader-panel {
+      text-align: center;
+      padding: 48px 20px 56px;
+      background: var(--carbon);
+      color: #fff;
+      border-top: 5px solid var(--racing);
+      margin-bottom: 28px;
+    }
+    .loader-panel p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-top: 18px;
+    }
+
+    /* Pirelli soft — spinning tire */
+    .pirelli-wrap {
+      display: flex;
+      justify-content: center;
+      perspective: 420px;
+      margin: 8px 0 4px;
+    }
+    .pirelli-soft {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: tireRoll 1.05s linear infinite;
+      background:
+        radial-gradient(circle at 50% 50%, #1b1b1b 0 46%, #2c2c2c 47% 58%, transparent 59%),
+        repeating-conic-gradient(from 0deg, #1f1f1f 0deg 9deg, #2e2e2e 9deg 18deg);
+      border: 11px solid #c40018;
+      box-shadow:
+        inset 0 0 0 5px #e8b923,
+        inset 0 0 20px rgba(0,0,0,.45),
+        0 12px 28px rgba(0,0,0,.35);
+    }
+    .pirelli-soft::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255,255,255,.12);
+      animation: ringSpin 1.6s linear infinite reverse;
+    }
+    .pirelli-soft::after {
+      content: 'SOFT';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .2em;
+      color: #ffe566;
+      text-shadow: 0 1px 2px #000;
+    }
+    @keyframes tireRoll {
+      from { transform: rotate(0deg) rotateX(18deg); }
+      to   { transform: rotate(360deg) rotateX(18deg); }
+    }
+    @keyframes ringSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .content[hidden] { display: none !important; }
+    .brief {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--ink-2);
+      margin-bottom: 28px;
+    }
+    .brief h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      margin: 28px 0 12px;
+      color: var(--ink);
+    }
+    .brief ul { margin: 10px 0 10px 22px; }
+    .brief li { margin: 6px 0; }
+
+    .prompt-box {
+      border: 1px solid #cfc7b8;
+      background: #fff;
+      padding: 16px;
+    }
+    .prompt-box h3 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      padding: 12px;
+      border: 1px solid #cfc7b8;
+      resize: vertical;
+      background: #faf8f4;
+    }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    button {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      padding: 12px 18px;
+      border: none;
+      cursor: pointer;
+      background: var(--racing);
+      color: #fff;
+    }
+    button.secondary {
+      background: var(--carbon);
+    }
+    .note {
+      font-size: 12px;
+      color: var(--ink-3);
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <a class="back" href="index.html">← Dashboard</a>
+      <h1>AI <em>Pit Briefing</em></h1>
+    </div>
+
+    <div class="loader-panel" id="loaderPanel">
+      <div class="pirelli-wrap" aria-hidden="true">
+        <div class="pirelli-soft"></div>
+      </div>
+      <p>Generating briefing · Pirelli Soft</p>
+    </div>
+
+    <div class="content" id="mainContent" hidden>
+      <div class="brief" id="briefOut"></div>
+      <div class="prompt-box">
+        <h3>Copy for ChatGPT / Claude / Gemini</h3>
+        <textarea id="promptTa" readonly></textarea>
+        <div class="row">
+          <button type="button" id="copyBtn">Copy prompt</button>
+          <button type="button" class="secondary" id="regenBtn">Regenerate</button>
+        </div>
+        <p class="note">
+          This page does not call a paid model by itself — it builds a structured prompt from live public APIs (Jolpica, OpenF1, BBC RSS).
+          Paste the prompt into your assistant of choice for a real model response.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const JOLPICA = 'https://api.jolpi.ca/ergast/f1';
+    const OPENF1 = 'https://api.openf1.org/v1';
+
+    async function fetchJson(url) {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(String(r.status));
+      return r.json();
+    }
+
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;');
+    }
+
+    function stripTags(h) {
+      return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    async function loadAll() {
+      const rssUrl = encodeURIComponent('https://feeds.bbci.co.uk/sport/formula1/rss.xml');
+      const [driversJ, consJ, nextJ, lastJ, sessLatest, newsJ] = await Promise.all([
+        fetchJson(`${JOLPICA}/current/driverStandings.json?limit=50`),
+        fetchJson(`${JOLPICA}/current/constructorStandings.json?limit=50`),
+        fetchJson(`${JOLPICA}/current/next.json`),
+        fetchJson(`${JOLPICA}/current/last/results.json`).catch(() => null),
+        fetchJson(`${OPENF1}/sessions?session_key=latest`).catch(() => []),
+        fetchJson(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`).catch(() => null)
+      ]);
+
+      const dStand = driversJ?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || [];
+      const cStand = consJ?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || [];
+      const nextR = nextJ?.MRData?.RaceTable?.Races?.[0];
+      const lastR = lastJ?.MRData?.RaceTable?.Races?.[0];
+      const latestSess = Array.isArray(sessLatest) && sessLatest[0] ? sessLatest[0] : null;
+      const headlines = (newsJ?.items || []).slice(0, 6).map(it => ({
+        title: it.title,
+        link: it.link,
+        desc: stripTags(it.description || it.content || '').slice(0, 220)
+      }));
+
+      const topD = dStand.map(r => `${r.position}. ${r.Driver?.givenName} ${r.Driver?.familyName} (${r.Driver?.code}) — ${r.points} pts`);
+      const allC = cStand.map(r => `${r.position}. ${r.Constructor?.name} — ${r.points} pts`);
+
+      const briefHtml = ''
+        + '<h2>Executive read</h2>'
+        + `<p>Next on the calendar: <strong>${esc(nextR?.raceName || 'TBC')}</strong> (${esc(nextR?.Circuit?.circuitName || '')}, ${esc(nextR?.Circuit?.Location?.country || '')}).</p>`
+        + (latestSess ? `<p>OpenF1 latest session: <strong>${esc(latestSess.session_name || latestSess.session_type)}</strong> · ${esc(latestSess.circuit_short_name || '')} · key <code>${esc(String(latestSess.session_key))}</code>.</p>` : '<p>OpenF1 session context unavailable.</p>')
+        + (lastR ? `<p>Last result: <strong>${esc(lastR.raceName)}</strong> — winner <strong>${esc(lastR.Results?.[0]?.Driver?.familyName || '')}</strong>.</p>` : '')
+        + '<h2>Standings snapshot</h2><p><strong>Drivers (full grid)</strong></p><ul>' + topD.map(t => `<li>${esc(t)}</li>`).join('') + '</ul>'
+        + '<p><strong>Constructors (full field)</strong></p><ul>' + allC.map(t => `<li>${esc(t)}</li>`).join('') + '</ul>'
+        + '<h2>News pulse</h2><ul>'
+        + headlines.map(h => `<li><a href="${esc(h.link)}">${esc(h.title)}</a> — ${esc(h.desc)}</li>`).join('')
+        + '</ul>';
+
+      const pack = {
+        generatedAt: new Date().toISOString(),
+        nextRace: nextR,
+        latestOpenF1Session: latestSess,
+        lastRace: lastR,
+        driverStandingsAll: dStand,
+        constructorStandingsAll: cStand,
+        headlines
+      };
+
+      const prompt = [
+        'You are an elite F1 strategist and data journalist.',
+        'Use ONLY the JSON below as ground truth. If something is missing, say so.',
+        'Deliver: (1) 6-bullet executive summary (2) championship narrative drivers+constructors (3) what to watch next session/weekend (4) 3 risks/unknowns (5) one contrarian take.',
+        'Tone: sharp, neutral, fan-friendly. No hallucinated lap times or grid penalties.',
+        '',
+        'DATA_JSON:',
+        JSON.stringify(pack, null, 2)
+      ].join('\n');
+
+      return { briefHtml, prompt };
+    }
+
+    async function run() {
+      const loader = document.getElementById('loaderPanel');
+      const main = document.getElementById('mainContent');
+      const briefOut = document.getElementById('briefOut');
+      const ta = document.getElementById('promptTa');
+      const t0 = Date.now();
+      try {
+        const { briefHtml, prompt } = await loadAll();
+        const wait = Math.max(0, 1200 - (Date.now() - t0));
+        await new Promise(r => setTimeout(r, wait));
+        briefOut.innerHTML = briefHtml;
+        ta.value = prompt;
+        loader.hidden = true;
+        main.hidden = false;
+      } catch (e) {
+        briefOut.innerHTML = '<h2>Could not load data</h2><p>Try refreshing. If you are offline, the briefing needs network access for Jolpica / OpenF1 / RSS.</p>';
+        ta.value = '';
+        loader.hidden = true;
+        main.hidden = false;
+      }
+    }
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const ta = document.getElementById('promptTa');
+      try {
+        await navigator.clipboard.writeText(ta.value);
+        document.getElementById('copyBtn').textContent = 'Copied';
+        setTimeout(() => { document.getElementById('copyBtn').textContent = 'Copy prompt'; }, 1600);
+      } catch (_) {
+        ta.select();
+        document.execCommand('copy');
+      }
+    });
+    document.getElementById('regenBtn').addEventListener('click', () => {
+      document.getElementById('loaderPanel').hidden = false;
+      document.getElementById('mainContent').hidden = true;
+      run();
+    });
+
+    run();
+  </script>
+</body>
+</html>
